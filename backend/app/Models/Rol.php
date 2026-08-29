@@ -25,7 +25,7 @@ class Rol extends Model
             User::class,
             'usuario_rol',
             'rol_id',
-            'user_id'
+            'usuario_id'
         );
     }
 
