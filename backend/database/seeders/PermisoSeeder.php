@@ -26,6 +26,12 @@ class PermisoSeeder extends Seeder
             ['nombre' => 'empresa.ver', 'modulo' => 'Empresa', 'descripcion' => 'Ver información de la empresa.'],
             ['nombre' => 'empresa.editar', 'modulo' => 'Empresa', 'descripcion' => 'Editar información de la empresa.'],
 
+            // Tipos de negocio
+            ['nombre' => 'tipos_negocio.ver', 'modulo' => 'Tipos de negocio', 'descripcion' => 'Ver los tipos de negocio disponibles.'],
+            ['nombre' => 'tipos_negocio.crear', 'modulo' => 'Tipos de negocio', 'descripcion' => 'Crear tipos de negocio.'],
+            ['nombre' => 'tipos_negocio.editar', 'modulo' => 'Tipos de negocio', 'descripcion' => 'Editar tipos de negocio.'],
+            ['nombre' => 'tipos_negocio.activar', 'modulo' => 'Tipos de negocio', 'descripcion' => 'Activar o desactivar tipos de negocio.'],
+
             // Productos
             ['nombre' => 'productos.ver', 'modulo' => 'Productos', 'descripcion' => 'Ver productos.'],
             ['nombre' => 'productos.crear', 'modulo' => 'Productos', 'descripcion' => 'Crear productos.'],

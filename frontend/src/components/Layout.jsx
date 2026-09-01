@@ -1,19 +1,20 @@
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
+    Tags,
     Package,
-    ShoppingCart,
     ShoppingBag,
+    ShoppingCart,
     Factory,
     Calculator,
     BarChart3,
-    Tags,
     Settings,
     LogOut,
     Bell,
     ChevronDown,
+    Store,
 } from 'lucide-react';
 
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 function Layout() {
@@ -42,6 +43,24 @@ function Layout() {
             navigate('/', { replace: true });
         }
     };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Comprobar Administrador
+    |--------------------------------------------------------------------------
+    */
+
+    const esAdministrador =
+        usuario?.roles?.some(
+            (rol) => rol?.toLowerCase() === 'administrador'
+        ) ?? false;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Menú principal
+    |--------------------------------------------------------------------------
+    */
 
     const menuPrincipal = [
         {
@@ -86,12 +105,17 @@ function Layout() {
         },
     ];
 
+
     return (
         <div className="app-layout">
 
-            {/* SIDEBAR */}
+            {/* =========================================
+                SIDEBAR
+            ========================================= */}
 
             <aside className="sidebar">
+
+                {/* LOGO */}
 
                 <div className="sidebar-logo">
 
@@ -107,10 +131,11 @@ function Layout() {
                 </div>
 
 
+                {/* MENÚ PRINCIPAL */}
+
                 <div className="menu-title">
                     MENÚ PRINCIPAL
                 </div>
-
 
                 <nav className="sidebar-menu">
 
@@ -143,23 +168,74 @@ function Layout() {
                 </nav>
 
 
+                {/* PARTE INFERIOR */}
+
                 <div className="sidebar-bottom">
+
+                    {/* =====================================
+                        TIPOS DE NEGOCIO
+                        SOLO ADMINISTRADOR
+                    ===================================== */}
+
+                    {esAdministrador && (
+
+                        <NavLink
+                            to="/tipos-negocio"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? 'menu-item active'
+                                    : 'menu-item'
+                            }
+                        >
+
+                            <Store size={19} />
+
+                            <span>
+                                Tipos de negocio
+                            </span>
+
+                        </NavLink>
+
+                    )}
+
+
+                    {/* =====================================
+                        CONFIGURACIÓN
+                    ===================================== */}
 
                     <NavLink
                         to="/configuracion"
-                        className="menu-item"
+                        className={({ isActive }) =>
+                            isActive
+                                ? 'menu-item active'
+                                : 'menu-item'
+                        }
                     >
+
                         <Settings size={19} />
-                        <span>Configuración</span>
+
+                        <span>
+                            Configuración
+                        </span>
+
                     </NavLink>
 
+
+                    {/* =====================================
+                        CERRAR SESIÓN
+                    ===================================== */}
 
                     <button
                         className="logout-button"
                         onClick={cerrarSesion}
                     >
+
                         <LogOut size={19} />
-                        <span>Cerrar sesión</span>
+
+                        <span>
+                            Cerrar sesión
+                        </span>
+
                     </button>
 
                 </div>
@@ -167,34 +243,57 @@ function Layout() {
             </aside>
 
 
-            {/* ÁREA PRINCIPAL */}
+            {/* =========================================
+                ÁREA PRINCIPAL
+            ========================================= */}
 
             <div className="main-area">
 
-                {/* HEADER */}
+
+                {/* =========================================
+                    TOPBAR
+                ========================================= */}
 
                 <header className="topbar">
 
                     <div className="topbar-left">
+
                         <span className="topbar-title">
                             Sistema de gestión empresarial
                         </span>
+
                     </div>
 
 
                     <div className="topbar-right">
 
-                        <button className="notification-button">
+
+                        {/* NOTIFICACIONES */}
+
+                        <button
+                            className="notification-button"
+                            type="button"
+                        >
+
                             <Bell size={20} />
+
                             <span className="notification-dot"></span>
+
                         </button>
 
+
+                        {/* USUARIO */}
 
                         <div className="user-profile">
 
                             <div className="user-avatar">
-                                {usuario?.name?.charAt(0).toUpperCase()}
+
+                                {usuario?.name
+                                    ?.charAt(0)
+                                    .toUpperCase()}
+
                             </div>
+
 
                             <div className="user-info">
 
@@ -208,6 +307,7 @@ function Layout() {
 
                             </div>
 
+
                             <ChevronDown size={16} />
 
                         </div>
@@ -217,7 +317,9 @@ function Layout() {
                 </header>
 
 
-                {/* CONTENIDO */}
+                {/* =========================================
+                    CONTENIDO
+                ========================================= */}
 
                 <main className="content-area">
 

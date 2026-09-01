@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TipoNegocio extends Model
 {
@@ -18,9 +17,4 @@ class TipoNegocio extends Model
     protected $casts = [
         'activo' => 'boolean',
     ];
-
-    public function empresas(): HasMany
-    {
-        return $this->hasMany(Empresa::class);
-    }
 }

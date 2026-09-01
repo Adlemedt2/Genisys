@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Empresa extends Model
 {
@@ -25,8 +26,25 @@ class Empresa extends Model
         'activo' => 'boolean',
     ];
 
+    /**
+     * Tipo de negocio de la empresa.
+     */
     public function tipoNegocio(): BelongsTo
     {
-        return $this->belongsTo(TipoNegocio::class);
+        return $this->belongsTo(
+            TipoNegocio::class,
+            'tipo_negocio_id'
+        );
+    }
+
+    /**
+     * Usuarios pertenecientes a la empresa.
+     */
+    public function usuarios(): HasMany
+    {
+        return $this->hasMany(
+            User::class,
+            'empresa_id'
+        );
     }
 }

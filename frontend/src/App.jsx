@@ -9,9 +9,10 @@ import Ventas from './pages/Ventas';
 import Produccion from './pages/Produccion';
 import Contabilidad from './pages/Contabilidad';
 import Reportes from './pages/Reportes';
-
+import Configuracion from './pages/Configuracion';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import TiposNegocio from './pages/TiposNegocio';
 
 function App() {
     return (
@@ -35,6 +36,8 @@ function App() {
                     <Route path="/produccion" element={<Produccion />} />
                     <Route path="/contabilidad" element={<Contabilidad />} />
                     <Route path="/reportes" element={<Reportes />} />
+                    <Route path="/configuracion" element={<Configuracion />} />
+                    <Route path="/tipos-negocio" element={<TiposNegocio />} />
                 </Route>
 
             </Routes>
