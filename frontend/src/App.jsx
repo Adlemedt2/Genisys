@@ -1,39 +1,61 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+} from 'react-router-dom';
 
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+
 import Catalogos from './pages/Catalogos';
+import Clientes from './pages/Clientes';
+import Productos from './pages/Productos';
+
 import Inventario from './pages/Inventario';
 import Compras from './pages/Compras';
 import Ventas from './pages/Ventas';
 import Produccion from './pages/Produccion';
 import Contabilidad from './pages/Contabilidad';
 import Reportes from './pages/Reportes';
+
 import Configuracion from './pages/Configuracion';
-import ProtectedRoute from './components/ProtectedRoute';
+
 import Layout from './components/Layout';
-import TiposNegocio from './pages/TiposNegocio';
-import Usuarios from './pages/Usuarios';
-import Productos from './pages/Productos';
+import ProtectedRoute from './components/ProtectedRoute';
+
+import AccesoDenegado from './pages/AccesoDenegado';
+
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
 
-                {/* =========================================
+                {/* =================================================
                     LOGIN
-                ========================================= */}
+                ================================================= */}
 
                 <Route
                     path="/"
                     element={<Login />}
                 />
 
+                {/* =================================================
+                    ACCESO DENEGADO
+                ================================================= */}
 
-                {/* =========================================
-                    ÁREA PROTEGIDA
-                ========================================= */}
+                <Route
+                    path="/acceso-denegado"
+                    element={
+                        <ProtectedRoute>
+                            <AccesoDenegado />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* =================================================
+                    RUTAS PROTEGIDAS
+                ================================================= */}
 
                 <Route
                     element={
@@ -43,141 +65,167 @@ function App() {
                     }
                 >
 
-                    {/* DASHBOARD */}
+                    {/* =============================================
+                        DASHBOARD
+                    ============================================= */}
 
                     <Route
                         path="/dashboard"
-                        element={
-                            <Dashboard />
-                        }
+                        element={<Dashboard />}
                     />
 
-
-                    {/* CATÁLOGOS */}
+                    {/* =============================================
+                        CATÁLOGOS
+                    ============================================= */}
 
                     <Route
                         path="/catalogos"
                         element={
-                            <ProtectedRoute permiso="productos.ver">
+                            <ProtectedRoute
+                                funcionalidad="catalogos"
+                                permiso="productos.ver"
+                            >
                                 <Catalogos />
                             </ProtectedRoute>
                         }
                     />
 
+                    {/* =============================================
+                        PRODUCTOS
+                    ============================================= */}
 
-                    {/* INVENTARIO */}
+                    <Route
+                        path="/catalogos/productos"
+                        element={
+                            <ProtectedRoute
+                                funcionalidad="catalogos"
+                                permiso="productos.ver"
+                            >
+                                <Productos />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* =============================================
+                        INVENTARIO
+                    ============================================= */}
 
                     <Route
                         path="/inventario"
                         element={
-                            <ProtectedRoute permiso="inventario.ver">
+                            <ProtectedRoute
+                                funcionalidad="inventario"
+                                permiso="inventario.ver"
+                            >
                                 <Inventario />
                             </ProtectedRoute>
                         }
                     />
 
-
-                    {/* COMPRAS */}
+                    {/* =============================================
+                        COMPRAS
+                    ============================================= */}
 
                     <Route
                         path="/compras"
                         element={
-                            <ProtectedRoute permiso="compras.ver">
+                            <ProtectedRoute
+                                funcionalidad="compras"
+                                permiso="compras.ver"
+                            >
                                 <Compras />
                             </ProtectedRoute>
                         }
                     />
 
-
-                    {/* VENTAS */}
+                    {/* =============================================
+                        VENTAS
+                    ============================================= */}
 
                     <Route
                         path="/ventas"
                         element={
-                            <ProtectedRoute permiso="ventas.ver">
+                            <ProtectedRoute
+                                funcionalidad="ventas"
+                                permiso="ventas.ver"
+                            >
                                 <Ventas />
                             </ProtectedRoute>
                         }
                     />
 
-                    {/* PRODUCTOS */}
-                    <Route
-                        path="/catalogos/productos"
-                        element={
-                            <ProtectedRoute permiso="productos.ver">
-                                <Productos />
-                            </ProtectedRoute>
-                        }
-                    />
-                    
-                    {/* PRODUCCIÓN */}
+                    {/* =============================================
+                        PRODUCCIÓN
+                    ============================================= */}
 
                     <Route
                         path="/produccion"
                         element={
-                            <ProtectedRoute permiso="produccion.ver">
+                            <ProtectedRoute
+                                funcionalidad="produccion"
+                                permiso="produccion.ver"
+                            >
                                 <Produccion />
                             </ProtectedRoute>
                         }
                     />
 
-
-                    {/* CONTABILIDAD */}
+                    {/* =============================================
+                        CONTABILIDAD
+                    ============================================= */}
 
                     <Route
                         path="/contabilidad"
                         element={
-                            <ProtectedRoute permiso="contabilidad.ver">
+                            <ProtectedRoute
+                                funcionalidad="contabilidad"
+                                permiso="contabilidad.ver"
+                            >
                                 <Contabilidad />
                             </ProtectedRoute>
                         }
                     />
 
-
-                    {/* REPORTES */}
+                    {/* =============================================
+                        REPORTES
+                    ============================================= */}
 
                     <Route
                         path="/reportes"
                         element={
-                            <ProtectedRoute permiso="reportes.ver">
+                            <ProtectedRoute
+                                funcionalidad="reportes"
+                                permiso="reportes.ver"
+                            >
                                 <Reportes />
                             </ProtectedRoute>
                         }
                     />
 
+                    {/* =============================================
+                        CLIENTES
+                    ============================================= */}
 
-                    {/* CONFIGURACIÓN */}
+                    <Route
+                        path="/catalogos/clientes"
+                        element={
+                            <ProtectedRoute
+                                funcionalidad="catalogos"
+                                permiso="clientes.ver"
+                            >
+                                <Clientes />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* =============================================
+                        CONFIGURACIÓN
+                    ============================================= */}
 
                     <Route
                         path="/configuracion"
                         element={
-                            <ProtectedRoute permiso="empresa.ver">
-                                <Configuracion />
-                            </ProtectedRoute>
-                        }
-                    />
-
-
-                    {/* TIPOS DE NEGOCIO */}
-
-                    <Route
-                        path="/tipos-negocio"
-                        element={
-                            <ProtectedRoute permiso="tipos_negocio.ver">
-                                <TiposNegocio />
-                            </ProtectedRoute>
-                        }
-                    />
-
-
-                    {/* USUARIOS */}
-
-                    <Route
-                        path="/usuarios"
-                        element={
-                            <ProtectedRoute permiso="usuarios.ver">
-                                <Usuarios />
-                            </ProtectedRoute>
+                            <Configuracion />
                         }
                     />
 

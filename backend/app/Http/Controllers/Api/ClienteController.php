@@ -3,23 +3,26 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Producto;
+use App\Models\Cliente;
 use App\Services\EmpresaContext;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 
-class ProductoController extends Controller
+class ClienteController extends Controller
 {
     /**
-     * Verificar que el usuario tenga habilitado el módulo
-     * correspondiente a productos para su tipo de negocio.
+     * Verifica que el usuario tenga acceso al módulo
+     * de catálogos según el tipo de negocio de su empresa.
      */
     private function verificarFuncionalidad(
         EmpresaContext $empresaContext,
         $usuario
     ): ?JsonResponse {
-        if (!$empresaContext->tieneFuncionalidad($usuario, 'catalogos')) {
+        if (!$empresaContext->tieneFuncionalidad(
+            $usuario,
+            'catalogos'
+        )) {
             return response()->json([
                 'message' => 'El módulo de catálogos no está habilitado para el tipo de negocio de esta empresa.',
             ], 403);
@@ -29,7 +32,7 @@ class ProductoController extends Controller
     }
 
     /**
-     * Listar productos de la empresa actual.
+     * Listar clientes de la empresa actual.
      */
     public function index(
         Request $request,
@@ -37,9 +40,9 @@ class ProductoController extends Controller
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.ver')) {
+        if (!$usuario->tienePermiso('clientes.ver')) {
             return response()->json([
-                'message' => 'No tienes permisos para consultar productos.',
+                'message' => 'No tienes permisos para consultar clientes.',
             ], 403);
         }
 
@@ -55,15 +58,16 @@ class ProductoController extends Controller
         try {
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
-            $productos = Producto::where(
+            $clientes = Cliente::where(
                 'empresa_id',
                 $empresa->id
             )
                 ->orderBy('nombre')
+                ->orderBy('apellido')
                 ->get();
 
             return response()->json([
-                'productos' => $productos,
+                'clientes' => $clientes,
             ]);
 
         } catch (\RuntimeException $error) {
@@ -75,7 +79,7 @@ class ProductoController extends Controller
     }
 
     /**
-     * Crear un producto.
+     * Crear un cliente.
      */
     public function store(
         Request $request,
@@ -83,9 +87,9 @@ class ProductoController extends Controller
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.crear')) {
+        if (!$usuario->tienePermiso('clientes.crear')) {
             return response()->json([
-                'message' => 'No tienes permisos para crear productos.',
+                'message' => 'No tienes permisos para crear clientes.',
             ], 403);
         }
 
@@ -102,11 +106,17 @@ class ProductoController extends Controller
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
             $datos = $request->validate([
-                'codigo' => [
+                'tipo_documento' => [
                     'required',
                     'string',
-                    'max:100',
-                    Rule::unique('productos', 'codigo')
+                    'max:30',
+                ],
+
+                'numero_documento' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique('clientes', 'numero_documento')
                         ->where(
                             fn ($query) =>
                             $query->where(
@@ -119,48 +129,42 @@ class ProductoController extends Controller
                 'nombre' => [
                     'required',
                     'string',
-                    'max:150',
+                    'max:100',
                 ],
 
-                'descripcion' => [
-                    'nullable',
-                    'string',
-                ],
-
-                'categoria' => [
+                'apellido' => [
                     'nullable',
                     'string',
                     'max:100',
                 ],
 
-                'unidad_medida' => [
-                    'required',
+                'telefono' => [
+                    'nullable',
                     'string',
-                    'max:50',
+                    'max:30',
                 ],
 
-                'precio_compra' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'email' => [
+                    'nullable',
+                    'email',
+                    'max:150',
                 ],
 
-                'precio_venta' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'direccion' => [
+                    'nullable',
+                    'string',
+                    'max:200',
                 ],
 
-                'stock_minimo' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'ciudad' => [
+                    'nullable',
+                    'string',
+                    'max:100',
                 ],
 
-                'stock_actual' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'observaciones' => [
+                    'nullable',
+                    'string',
                 ],
 
                 'activo' => [
@@ -169,15 +173,15 @@ class ProductoController extends Controller
                 ],
             ]);
 
-            $producto = Producto::create([
+            $cliente = Cliente::create([
                 ...$datos,
                 'empresa_id' => $empresa->id,
                 'activo' => $datos['activo'] ?? true,
             ]);
 
             return response()->json([
-                'message' => 'Producto creado correctamente.',
-                'producto' => $producto,
+                'message' => 'Cliente creado correctamente.',
+                'cliente' => $cliente,
             ], 201);
 
         } catch (\RuntimeException $error) {
@@ -189,18 +193,18 @@ class ProductoController extends Controller
     }
 
     /**
-     * Actualizar un producto.
+     * Actualizar un cliente.
      */
     public function update(
         Request $request,
-        Producto $producto,
+        Cliente $cliente,
         EmpresaContext $empresaContext
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.editar')) {
+        if (!$usuario->tienePermiso('clientes.editar')) {
             return response()->json([
-                'message' => 'No tienes permisos para editar productos.',
+                'message' => 'No tienes permisos para editar clientes.',
             ], 403);
         }
 
@@ -216,18 +220,27 @@ class ProductoController extends Controller
         try {
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
-            if ((int) $producto->empresa_id !== (int) $empresa->id) {
+            if (
+                (int) $cliente->empresa_id !==
+                (int) $empresa->id
+            ) {
                 return response()->json([
-                    'message' => 'El producto no pertenece a la empresa actual.',
+                    'message' => 'El cliente no pertenece a la empresa actual.',
                 ], 403);
             }
 
             $datos = $request->validate([
-                'codigo' => [
+                'tipo_documento' => [
                     'required',
                     'string',
-                    'max:100',
-                    Rule::unique('productos', 'codigo')
+                    'max:30',
+                ],
+
+                'numero_documento' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique('clientes', 'numero_documento')
                         ->where(
                             fn ($query) =>
                             $query->where(
@@ -235,54 +248,48 @@ class ProductoController extends Controller
                                 $empresa->id
                             )
                         )
-                        ->ignore($producto->id),
+                        ->ignore($cliente->id),
                 ],
 
                 'nombre' => [
                     'required',
                     'string',
-                    'max:150',
+                    'max:100',
                 ],
 
-                'descripcion' => [
-                    'nullable',
-                    'string',
-                ],
-
-                'categoria' => [
+                'apellido' => [
                     'nullable',
                     'string',
                     'max:100',
                 ],
 
-                'unidad_medida' => [
-                    'required',
+                'telefono' => [
+                    'nullable',
                     'string',
-                    'max:50',
+                    'max:30',
                 ],
 
-                'precio_compra' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'email' => [
+                    'nullable',
+                    'email',
+                    'max:150',
                 ],
 
-                'precio_venta' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'direccion' => [
+                    'nullable',
+                    'string',
+                    'max:200',
                 ],
 
-                'stock_minimo' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'ciudad' => [
+                    'nullable',
+                    'string',
+                    'max:100',
                 ],
 
-                'stock_actual' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'observaciones' => [
+                    'nullable',
+                    'string',
                 ],
 
                 'activo' => [
@@ -291,11 +298,11 @@ class ProductoController extends Controller
                 ],
             ]);
 
-            $producto->update($datos);
+            $cliente->update($datos);
 
             return response()->json([
-                'message' => 'Producto actualizado correctamente.',
-                'producto' => $producto->fresh(),
+                'message' => 'Cliente actualizado correctamente.',
+                'cliente' => $cliente->fresh(),
             ]);
 
         } catch (\RuntimeException $error) {
@@ -307,18 +314,18 @@ class ProductoController extends Controller
     }
 
     /**
-     * Activar o desactivar un producto.
+     * Activar o desactivar un cliente.
      */
     public function cambiarEstado(
         Request $request,
-        Producto $producto,
+        Cliente $cliente,
         EmpresaContext $empresaContext
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.eliminar')) {
+        if (!$usuario->tienePermiso('clientes.editar')) {
             return response()->json([
-                'message' => 'No tienes permisos para cambiar el estado de productos.',
+                'message' => 'No tienes permisos para cambiar el estado de clientes.',
             ], 403);
         }
 
@@ -334,20 +341,23 @@ class ProductoController extends Controller
         try {
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
-            if ((int) $producto->empresa_id !== (int) $empresa->id) {
+            if (
+                (int) $cliente->empresa_id !==
+                (int) $empresa->id
+            ) {
                 return response()->json([
-                    'message' => 'El producto no pertenece a la empresa actual.',
+                    'message' => 'El cliente no pertenece a la empresa actual.',
                 ], 403);
             }
 
-            $producto->activo = !$producto->activo;
-            $producto->save();
+            $cliente->activo = !$cliente->activo;
+            $cliente->save();
 
             return response()->json([
-                'message' => $producto->activo
-                    ? 'Producto activado correctamente.'
-                    : 'Producto desactivado correctamente.',
-                'producto' => $producto->fresh(),
+                'message' => $cliente->activo
+                    ? 'Cliente activado correctamente.'
+                    : 'Cliente desactivado correctamente.',
+                'cliente' => $cliente->fresh(),
             ]);
 
         } catch (\RuntimeException $error) {

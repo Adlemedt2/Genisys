@@ -68,4 +68,39 @@ class EmpresaContext
         return $this->obtenerTipoNegocioId($usuario)
             === $tipoNegocioId;
     }
+
+    /**
+     * Obtener las funcionalidades disponibles
+     * para el tipo de negocio de la empresa.
+     */
+    public function obtenerFuncionalidades(User $usuario)
+    {
+        $tipoNegocio = $this->obtenerTipoNegocio($usuario);
+
+        return $tipoNegocio
+            ->funcionalidades()
+            ->where('funcionalidades.activo', true)
+            ->orderBy('funcionalidades.nombre')
+            ->get();
+    }
+
+    /**
+     * Comprobar si la empresa tiene una funcionalidad habilitada.
+     *
+     * Ejemplo:
+     *
+     * $contexto->tieneFuncionalidad($usuario, 'inventario')
+     */
+    public function tieneFuncionalidad(
+        User $usuario,
+        string $codigo
+    ): bool {
+        $tipoNegocio = $this->obtenerTipoNegocio($usuario);
+
+        return $tipoNegocio
+            ->funcionalidades()
+            ->where('funcionalidades.codigo', $codigo)
+            ->where('funcionalidades.activo', true)
+            ->exists();
+    }
 }

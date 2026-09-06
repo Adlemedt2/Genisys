@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import {
-    Package,
+    Users,
     Plus,
     Search,
     Pencil,
@@ -13,8 +13,8 @@ import {
 import api from '../services/api';
 import { tienePermiso } from '../utils/permisos';
 
-function Productos() {
-    const [productos, setProductos] = useState([]);
+function Clientes() {
+    const [clientes, setClientes] = useState([]);
     const [cargando, setCargando] = useState(true);
 
     const [busqueda, setBusqueda] = useState('');
@@ -22,7 +22,7 @@ function Productos() {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [modoEdicion, setModoEdicion] = useState(false);
 
-    const [productoEditando, setProductoEditando] = useState(null);
+    const [clienteEditando, setClienteEditando] = useState(null);
 
     const [guardando, setGuardando] = useState(false);
 
@@ -30,37 +30,37 @@ function Productos() {
     const [error, setError] = useState('');
 
     const [formulario, setFormulario] = useState({
-        codigo: '',
+        tipo_documento: 'CC',
+        numero_documento: '',
         nombre: '',
-        descripcion: '',
-        categoria: '',
-        unidad_medida: 'unidad',
-        precio_compra: '',
-        precio_venta: '',
-        stock_minimo: '',
-        stock_actual: '',
+        apellido: '',
+        telefono: '',
+        email: '',
+        direccion: '',
+        ciudad: '',
+        observaciones: '',
         activo: true,
     });
 
-    const cargarProductos = async () => {
+    const cargarClientes = async () => {
         setCargando(true);
         setError('');
 
         try {
-            const respuesta = await api.get('/productos');
+            const respuesta = await api.get('/clientes');
 
-            setProductos(
-                respuesta.data.productos || []
+            setClientes(
+                respuesta.data.clientes || []
             );
         } catch (error) {
             console.error(
-                'Error cargando productos:',
+                'Error cargando clientes:',
                 error
             );
 
             setError(
                 error.response?.data?.message ||
-                'No fue posible cargar los productos.'
+                'No fue posible cargar los clientes.'
             );
         } finally {
             setCargando(false);
@@ -68,24 +68,24 @@ function Productos() {
     };
 
     useEffect(() => {
-        cargarProductos();
+        cargarClientes();
     }, []);
 
     const limpiarFormulario = () => {
         setFormulario({
-            codigo: '',
+            tipo_documento: 'CC',
+            numero_documento: '',
             nombre: '',
-            descripcion: '',
-            categoria: '',
-            unidad_medida: 'unidad',
-            precio_compra: '',
-            precio_venta: '',
-            stock_minimo: '',
-            stock_actual: '',
+            apellido: '',
+            telefono: '',
+            email: '',
+            direccion: '',
+            ciudad: '',
+            observaciones: '',
             activo: true,
         });
 
-        setProductoEditando(null);
+        setClienteEditando(null);
         setModoEdicion(false);
     };
 
@@ -98,27 +98,31 @@ function Productos() {
         setModalAbierto(true);
     };
 
-    const abrirEditar = (producto) => {
-        setProductoEditando(producto);
+    const abrirEditar = (cliente) => {
+        setClienteEditando(cliente);
         setModoEdicion(true);
 
         setFormulario({
-            codigo: producto.codigo || '',
-            nombre: producto.nombre || '',
-            descripcion: producto.descripcion || '',
-            categoria: producto.categoria || '',
-            unidad_medida:
-                producto.unidad_medida || 'unidad',
-            precio_compra:
-                producto.precio_compra ?? '',
-            precio_venta:
-                producto.precio_venta ?? '',
-            stock_minimo:
-                producto.stock_minimo ?? '',
-            stock_actual:
-                producto.stock_actual ?? '',
+            tipo_documento:
+                cliente.tipo_documento || 'CC',
+            numero_documento:
+                cliente.numero_documento || '',
+            nombre:
+                cliente.nombre || '',
+            apellido:
+                cliente.apellido || '',
+            telefono:
+                cliente.telefono || '',
+            email:
+                cliente.email || '',
+            direccion:
+                cliente.direccion || '',
+            ciudad:
+                cliente.ciudad || '',
+            observaciones:
+                cliente.observaciones || '',
             activo:
-                Boolean(producto.activo),
+                Boolean(cliente.activo),
         });
 
         setMensaje('');
@@ -156,7 +160,7 @@ function Productos() {
         setMensaje('');
     };
 
-    const guardarProducto = async (e) => {
+    const guardarCliente = async (e) => {
         e.preventDefault();
 
         setGuardando(true);
@@ -165,57 +169,64 @@ function Productos() {
 
         try {
             const datos = {
-                codigo: formulario.codigo.trim(),
-                nombre: formulario.nombre.trim(),
-                descripcion:
-                    formulario.descripcion.trim() || null,
-                categoria:
-                    formulario.categoria.trim() || null,
-                unidad_medida:
-                    formulario.unidad_medida.trim(),
-                precio_compra:
-                    Number(formulario.precio_compra),
-                precio_venta:
-                    Number(formulario.precio_venta),
-                stock_minimo:
-                    Number(formulario.stock_minimo),
-                stock_actual:
-                    Number(formulario.stock_actual),
+                tipo_documento:
+                    formulario.tipo_documento,
+                numero_documento:
+                    formulario.numero_documento.trim(),
+                nombre:
+                    formulario.nombre.trim(),
+                apellido:
+                    formulario.apellido.trim() || null,
+                telefono:
+                    formulario.telefono.trim() || null,
+                email:
+                    formulario.email.trim() || null,
+                direccion:
+                    formulario.direccion.trim() || null,
+                ciudad:
+                    formulario.ciudad.trim() || null,
+                observaciones:
+                    formulario.observaciones.trim() || null,
                 activo:
                     formulario.activo,
             };
 
             let respuesta;
 
-            if (modoEdicion && productoEditando) {
+            if (
+                modoEdicion &&
+                clienteEditando
+            ) {
                 respuesta = await api.put(
-                    `/productos/${productoEditando.id}`,
+                    `/clientes/${clienteEditando.id}`,
                     datos
                 );
             } else {
                 respuesta = await api.post(
-                    '/productos',
+                    '/clientes',
                     datos
                 );
             }
 
             setMensaje(
                 respuesta.data.message ||
-                'Producto guardado correctamente.'
+                'Cliente guardado correctamente.'
             );
 
             setModalAbierto(false);
             limpiarFormulario();
 
-            await cargarProductos();
+            await cargarClientes();
 
         } catch (error) {
             console.error(
-                'Error guardando producto:',
+                'Error guardando cliente:',
                 error
             );
 
-            if (error.response?.status === 422) {
+            if (
+                error.response?.status === 422
+            ) {
                 const errores =
                     error.response.data.errors;
 
@@ -236,7 +247,7 @@ function Productos() {
             } else {
                 setError(
                     error.response?.data?.message ||
-                    'No fue posible guardar el producto.'
+                    'No fue posible guardar el cliente.'
                 );
             }
         } finally {
@@ -244,13 +255,13 @@ function Productos() {
         }
     };
 
-    const cambiarEstado = async (producto) => {
-        const accion = producto.activo
+    const cambiarEstado = async (cliente) => {
+        const accion = cliente.activo
             ? 'desactivar'
             : 'activar';
 
         const confirmar = window.confirm(
-            `¿Deseas ${accion} el producto "${producto.nombre}"?`
+            `¿Deseas ${accion} al cliente "${cliente.nombre} ${cliente.apellido || ''}"?`
         );
 
         if (!confirmar) {
@@ -262,7 +273,7 @@ function Productos() {
 
         try {
             const respuesta = await api.patch(
-                `/productos/${producto.id}/estado`
+                `/clientes/${cliente.id}/estado`
             );
 
             setMensaje(
@@ -270,7 +281,7 @@ function Productos() {
                 'Estado actualizado correctamente.'
             );
 
-            await cargarProductos();
+            await cargarClientes();
 
         } catch (error) {
             console.error(
@@ -280,13 +291,13 @@ function Productos() {
 
             setError(
                 error.response?.data?.message ||
-                'No fue posible cambiar el estado del producto.'
+                'No fue posible cambiar el estado del cliente.'
             );
         }
     };
 
-    const productosFiltrados = productos.filter(
-        (producto) => {
+    const clientesFiltrados = clientes.filter(
+        (cliente) => {
             const texto = busqueda
                 .toLowerCase()
                 .trim();
@@ -296,49 +307,53 @@ function Productos() {
             }
 
             return (
-                producto.codigo
+                cliente.tipo_documento
                     ?.toLowerCase()
                     .includes(texto) ||
-                producto.nombre
+
+                cliente.numero_documento
                     ?.toLowerCase()
                     .includes(texto) ||
-                producto.categoria
+
+                cliente.nombre
+                    ?.toLowerCase()
+                    .includes(texto) ||
+
+                cliente.apellido
+                    ?.toLowerCase()
+                    .includes(texto) ||
+
+                cliente.telefono
+                    ?.toLowerCase()
+                    .includes(texto) ||
+
+                cliente.email
                     ?.toLowerCase()
                     .includes(texto)
             );
         }
     );
 
-    const formatearPrecio = (valor) => {
-        return new Intl.NumberFormat(
-            'es-CO',
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }
-        ).format(Number(valor || 0));
-    };
-
     return (
         <div className="dashboard-page">
 
             <div className="dashboard-header">
                 <div>
-                    <h1>Productos</h1>
+                    <h1>Clientes</h1>
 
                     <p>
-                        Administra los productos de tu negocio.
+                        Administra los clientes de tu negocio.
                     </p>
                 </div>
 
-                {tienePermiso('productos.crear') && (
+                {tienePermiso('clientes.crear') && (
                     <button
                         type="button"
                         className="config-save-button"
                         onClick={abrirNuevo}
                     >
                         <Plus size={18} />
-                        Nuevo producto
+                        Nuevo cliente
                     </button>
                 )}
             </div>
@@ -391,7 +406,7 @@ function Productos() {
                                     e.target.value
                                 )
                             }
-                            placeholder="Buscar por código, nombre o categoría..."
+                            placeholder="Buscar por documento, nombre, teléfono o correo..."
                             style={{
                                 width: '100%',
                                 padding:
@@ -410,30 +425,32 @@ function Productos() {
 
                 {cargando ? (
                     <div className="empty-state">
-                        <Package size={42} />
+                        <Users size={42} />
 
                         <h3>
-                            Cargando productos...
+                            Cargando clientes...
                         </h3>
                     </div>
-                ) : productosFiltrados.length === 0 ? (
+
+                ) : clientesFiltrados.length === 0 ? (
                     <div className="empty-state">
-                        <Package size={42} />
+                        <Users size={42} />
 
                         <h3>
                             {busqueda
-                                ? 'No se encontraron productos'
-                                : 'No hay productos registrados'}
+                                ? 'No se encontraron clientes'
+                                : 'No hay clientes registrados'}
                         </h3>
 
                         <p>
                             {busqueda
                                 ? 'Prueba con otro término de búsqueda.'
-                                : tienePermiso('productos.crear')
-                                    ? 'Crea tu primer producto para comenzar a trabajar con el catálogo.'
-                                    : 'No hay productos disponibles para mostrar.'}
+                                : tienePermiso('clientes.crear')
+                                    ? 'Crea tu primer cliente para comenzar a trabajar con el catálogo.'
+                                    : 'No hay clientes disponibles para mostrar.'}
                         </p>
                     </div>
+
                 ) : (
                     <div
                         style={{
@@ -449,103 +466,101 @@ function Productos() {
                         >
                             <thead>
                                 <tr>
-                                    <th
-                                        style={{
-                                            textAlign: 'left',
-                                            padding: '14px 12px',
-                                            borderBottom:
-                                                '1px solid #e2e8f0',
-                                            color: '#64748b',
-                                            fontSize: '12px',
-                                            textTransform:
-                                                'uppercase',
-                                        }}
-                                    >
-                                        Código
-                                    </th>
 
                                     <th
                                         style={{
                                             textAlign: 'left',
-                                            padding: '14px 12px',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
                                         }}
                                     >
-                                        Producto
+                                        Documento
                                     </th>
 
                                     <th
                                         style={{
                                             textAlign: 'left',
-                                            padding: '14px 12px',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
                                         }}
                                     >
-                                        Categoría
+                                        Cliente
                                     </th>
 
                                     <th
                                         style={{
-                                            textAlign: 'right',
-                                            padding: '14px 12px',
+                                            textAlign: 'left',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
                                         }}
                                     >
-                                        Precio compra
+                                        Teléfono
                                     </th>
 
                                     <th
                                         style={{
-                                            textAlign: 'right',
-                                            padding: '14px 12px',
+                                            textAlign: 'left',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
                                         }}
                                     >
-                                        Precio venta
+                                        Correo
                                     </th>
 
                                     <th
                                         style={{
-                                            textAlign: 'right',
-                                            padding: '14px 12px',
+                                            textAlign: 'left',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
                                         }}
                                     >
-                                        Stock
+                                        Ciudad
                                     </th>
 
                                     <th
                                         style={{
                                             textAlign: 'center',
-                                            padding: '14px 12px',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
@@ -557,10 +572,12 @@ function Productos() {
                                     <th
                                         style={{
                                             textAlign: 'center',
-                                            padding: '14px 12px',
+                                            padding:
+                                                '14px 12px',
                                             borderBottom:
                                                 '1px solid #e2e8f0',
-                                            color: '#64748b',
+                                            color:
+                                                '#64748b',
                                             fontSize: '12px',
                                             textTransform:
                                                 'uppercase',
@@ -568,17 +585,19 @@ function Productos() {
                                     >
                                         Acciones
                                     </th>
+
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {productosFiltrados.map(
-                                    (producto) => (
+                                {clientesFiltrados.map(
+                                    (cliente) => (
                                         <tr
                                             key={
-                                                producto.id
+                                                cliente.id
                                             }
                                         >
+
                                             <td
                                                 style={{
                                                     padding:
@@ -591,9 +610,12 @@ function Productos() {
                                                         '600',
                                                 }}
                                             >
-                                                {
-                                                    producto.codigo
-                                                }
+                                                <div>
+                                                    {cliente.tipo_documento}{' '}
+                                                    {
+                                                        cliente.numero_documento
+                                                    }
+                                                </div>
                                             </td>
 
                                             <td
@@ -613,11 +635,14 @@ function Productos() {
                                                     }}
                                                 >
                                                     {
-                                                        producto.nombre
+                                                        cliente.nombre
+                                                    }{' '}
+                                                    {
+                                                        cliente.apellido
                                                     }
                                                 </div>
 
-                                                {producto.descripcion && (
+                                                {cliente.direccion && (
                                                     <div
                                                         style={{
                                                             marginTop:
@@ -629,7 +654,7 @@ function Productos() {
                                                         }}
                                                     >
                                                         {
-                                                            producto.descripcion
+                                                            cliente.direccion
                                                         }
                                                     </div>
                                                 )}
@@ -647,7 +672,7 @@ function Productos() {
                                                         '#64748b',
                                                 }}
                                             >
-                                                {producto.categoria ||
+                                                {cliente.telefono ||
                                                     '—'}
                                             </td>
 
@@ -657,16 +682,14 @@ function Productos() {
                                                         '15px 12px',
                                                     borderBottom:
                                                         '1px solid #f1f5f9',
-                                                    textAlign:
-                                                        'right',
                                                     fontSize:
                                                         '13px',
+                                                    color:
+                                                        '#64748b',
                                                 }}
                                             >
-                                                $
-                                                {formatearPrecio(
-                                                    producto.precio_compra
-                                                )}
+                                                {cliente.email ||
+                                                    '—'}
                                             </td>
 
                                             <td
@@ -675,38 +698,14 @@ function Productos() {
                                                         '15px 12px',
                                                     borderBottom:
                                                         '1px solid #f1f5f9',
-                                                    textAlign:
-                                                        'right',
                                                     fontSize:
                                                         '13px',
-                                                    fontWeight:
-                                                        '600',
+                                                    color:
+                                                        '#64748b',
                                                 }}
                                             >
-                                                $
-                                                {formatearPrecio(
-                                                    producto.precio_venta
-                                                )}
-                                            </td>
-
-                                            <td
-                                                style={{
-                                                    padding:
-                                                        '15px 12px',
-                                                    borderBottom:
-                                                        '1px solid #f1f5f9',
-                                                    textAlign:
-                                                        'right',
-                                                    fontSize:
-                                                        '13px',
-                                                }}
-                                            >
-                                                {
-                                                    producto.stock_actual
-                                                }{' '}
-                                                {
-                                                    producto.unidad_medida
-                                                }
+                                                {cliente.ciudad ||
+                                                    '—'}
                                             </td>
 
                                             <td
@@ -733,7 +732,7 @@ function Productos() {
                                                             '600',
                                                     }}
                                                 >
-                                                    {producto.activo
+                                                    {cliente.activo
                                                         ? 'Activo'
                                                         : 'Inactivo'}
                                                 </span>
@@ -758,14 +757,15 @@ function Productos() {
                                                         gap: '6px',
                                                     }}
                                                 >
+
                                                     {tienePermiso(
-                                                        'productos.editar'
+                                                        'clientes.editar'
                                                     ) && (
                                                         <button
                                                             type="button"
                                                             onClick={() =>
                                                                 abrirEditar(
-                                                                    producto
+                                                                    cliente
                                                                 )
                                                             }
                                                             title="Editar"
@@ -791,17 +791,17 @@ function Productos() {
                                                     )}
 
                                                     {tienePermiso(
-                                                        'productos.eliminar'
+                                                        'clientes.editar'
                                                     ) && (
                                                         <button
                                                             type="button"
                                                             onClick={() =>
                                                                 cambiarEstado(
-                                                                    producto
+                                                                    cliente
                                                                 )
                                                             }
                                                             title={
-                                                                producto.activo
+                                                                cliente.activo
                                                                     ? 'Desactivar'
                                                                     : 'Activar'
                                                             }
@@ -825,8 +825,10 @@ function Productos() {
                                                             />
                                                         </button>
                                                     )}
+
                                                 </div>
                                             </td>
+
                                         </tr>
                                     )
                                 )}
@@ -865,12 +867,11 @@ function Productos() {
                                 '0 20px 50px rgba(0, 0, 0, 0.15)',
                         }}
                     >
+
                         <div
                             style={{
-                                display:
-                                    'flex',
-                                alignItems:
-                                    'center',
+                                display: 'flex',
+                                alignItems: 'center',
                                 justifyContent:
                                     'space-between',
                                 padding:
@@ -888,8 +889,8 @@ function Productos() {
                                     }}
                                 >
                                     {modoEdicion
-                                        ? 'Editar producto'
-                                        : 'Nuevo producto'}
+                                        ? 'Editar cliente'
+                                        : 'Nuevo cliente'}
                                 </h2>
 
                                 <p
@@ -902,7 +903,7 @@ function Productos() {
                                             '13px',
                                     }}
                                 >
-                                    Información del producto
+                                    Información del cliente
                                 </p>
                             </div>
 
@@ -931,169 +932,222 @@ function Productos() {
                             </button>
                         </div>
 
-                        <form onSubmit={guardarProducto}>
+                        <form
+                            onSubmit={
+                                guardarCliente
+                            }
+                        >
                             <div className="producto-form-grid">
 
                                 <div className="producto-form-field">
-                                    <label htmlFor="producto-codigo">
-                                        Código
+                                    <label htmlFor="cliente-tipo-documento">
+                                        Tipo de documento
                                     </label>
 
-                                    <input
-                                        id="producto-codigo"
+                                    <select
+                                        id="cliente-tipo-documento"
                                         className="producto-form-input"
-                                        name="codigo"
-                                        type="text"
-                                        value={formulario.codigo}
-                                        onChange={cambiarCampo}
-                                        placeholder="Ej. TORN-001"
-                                        maxLength={100}
+                                        name="tipo_documento"
+                                        value={
+                                            formulario.tipo_documento
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
                                         required
-                                    />
+                                    >
+                                        <option value="CC">
+                                            Cédula de ciudadanía
+                                        </option>
+
+                                        <option value="NIT">
+                                            NIT
+                                        </option>
+
+                                        <option value="CE">
+                                            Cédula de extranjería
+                                        </option>
+
+                                        <option value="Pasaporte">
+                                            Pasaporte
+                                        </option>
+
+                                        <option value="TI">
+                                            Tarjeta de identidad
+                                        </option>
+
+                                        <option value="Otro">
+                                            Otro
+                                        </option>
+                                    </select>
                                 </div>
 
                                 <div className="producto-form-field">
-                                    <label htmlFor="producto-nombre">
-                                        Nombre
+                                    <label htmlFor="cliente-numero-documento">
+                                        Número de documento
                                     </label>
 
                                     <input
-                                        id="producto-nombre"
+                                        id="cliente-numero-documento"
                                         className="producto-form-input"
-                                        name="nombre"
+                                        name="numero_documento"
                                         type="text"
-                                        value={formulario.nombre}
-                                        onChange={cambiarCampo}
-                                        placeholder="Ej. Tornillo 1/4"
-                                        maxLength={150}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="producto-form-field">
-                                    <label htmlFor="producto-categoria">
-                                        Categoría
-                                    </label>
-
-                                    <input
-                                        id="producto-categoria"
-                                        className="producto-form-input"
-                                        name="categoria"
-                                        type="text"
-                                        value={formulario.categoria}
-                                        onChange={cambiarCampo}
-                                        placeholder="Ej. Tornillería"
-                                        maxLength={100}
-                                    />
-                                </div>
-
-                                <div className="producto-form-field">
-                                    <label htmlFor="producto-unidad">
-                                        Unidad de medida
-                                    </label>
-
-                                    <input
-                                        id="producto-unidad"
-                                        className="producto-form-input"
-                                        name="unidad_medida"
-                                        type="text"
-                                        value={formulario.unidad_medida}
-                                        onChange={cambiarCampo}
-                                        placeholder="Ej. unidad"
+                                        value={
+                                            formulario.numero_documento
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. 1234567890"
                                         maxLength={50}
                                         required
                                     />
                                 </div>
 
+                                <div className="producto-form-field">
+                                    <label htmlFor="cliente-nombre">
+                                        Nombre
+                                    </label>
+
+                                    <input
+                                        id="cliente-nombre"
+                                        className="producto-form-input"
+                                        name="nombre"
+                                        type="text"
+                                        value={
+                                            formulario.nombre
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. Juan"
+                                        maxLength={100}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="producto-form-field">
+                                    <label htmlFor="cliente-apellido">
+                                        Apellido
+                                    </label>
+
+                                    <input
+                                        id="cliente-apellido"
+                                        className="producto-form-input"
+                                        name="apellido"
+                                        type="text"
+                                        value={
+                                            formulario.apellido
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. Pérez"
+                                        maxLength={100}
+                                    />
+                                </div>
+
+                                <div className="producto-form-field">
+                                    <label htmlFor="cliente-telefono">
+                                        Teléfono
+                                    </label>
+
+                                    <input
+                                        id="cliente-telefono"
+                                        className="producto-form-input"
+                                        name="telefono"
+                                        type="text"
+                                        value={
+                                            formulario.telefono
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. 3001234567"
+                                        maxLength={30}
+                                    />
+                                </div>
+
+                                <div className="producto-form-field">
+                                    <label htmlFor="cliente-email">
+                                        Correo electrónico
+                                    </label>
+
+                                    <input
+                                        id="cliente-email"
+                                        className="producto-form-input"
+                                        name="email"
+                                        type="email"
+                                        value={
+                                            formulario.email
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. cliente@correo.com"
+                                        maxLength={150}
+                                    />
+                                </div>
+
+                                <div className="producto-form-field">
+                                    <label htmlFor="cliente-ciudad">
+                                        Ciudad
+                                    </label>
+
+                                    <input
+                                        id="cliente-ciudad"
+                                        className="producto-form-input"
+                                        name="ciudad"
+                                        type="text"
+                                        value={
+                                            formulario.ciudad
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. Bogotá"
+                                        maxLength={100}
+                                    />
+                                </div>
+
+                                <div className="producto-form-field">
+                                    <label htmlFor="cliente-direccion">
+                                        Dirección
+                                    </label>
+
+                                    <input
+                                        id="cliente-direccion"
+                                        className="producto-form-input"
+                                        name="direccion"
+                                        type="text"
+                                        value={
+                                            formulario.direccion
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Ej. Calle 10 # 20-30"
+                                        maxLength={200}
+                                    />
+                                </div>
+
                                 <div className="producto-form-field producto-form-field-full">
-                                    <label htmlFor="producto-descripcion">
-                                        Descripción
+                                    <label htmlFor="cliente-observaciones">
+                                        Observaciones
                                     </label>
 
                                     <textarea
-                                        id="producto-descripcion"
+                                        id="cliente-observaciones"
                                         className="producto-form-textarea"
-                                        name="descripcion"
-                                        value={formulario.descripcion}
-                                        onChange={cambiarCampo}
-                                        placeholder="Descripción del producto"
+                                        name="observaciones"
+                                        value={
+                                            formulario.observaciones
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
+                                        placeholder="Observaciones del cliente"
                                         rows="4"
-                                    />
-                                </div>
-
-                                <div className="producto-form-field">
-                                    <label htmlFor="producto-precio-compra">
-                                        Precio de compra
-                                    </label>
-
-                                    <input
-                                        id="producto-precio-compra"
-                                        className="producto-form-input"
-                                        name="precio_compra"
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={formulario.precio_compra}
-                                        onChange={cambiarCampo}
-                                        placeholder="0.00"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="producto-form-field">
-                                    <label htmlFor="producto-precio-venta">
-                                        Precio de venta
-                                    </label>
-
-                                    <input
-                                        id="producto-precio-venta"
-                                        className="producto-form-input"
-                                        name="precio_venta"
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={formulario.precio_venta}
-                                        onChange={cambiarCampo}
-                                        placeholder="0.00"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="producto-form-field">
-                                    <label htmlFor="producto-stock-minimo">
-                                        Stock mínimo
-                                    </label>
-
-                                    <input
-                                        id="producto-stock-minimo"
-                                        className="producto-form-input"
-                                        name="stock_minimo"
-                                        type="number"
-                                        min="0"
-                                        step="0.001"
-                                        value={formulario.stock_minimo}
-                                        onChange={cambiarCampo}
-                                        placeholder="0"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="producto-form-field">
-                                    <label htmlFor="producto-stock-actual">
-                                        Stock actual
-                                    </label>
-
-                                    <input
-                                        id="producto-stock-actual"
-                                        className="producto-form-input"
-                                        name="stock_actual"
-                                        type="number"
-                                        min="0"
-                                        step="0.001"
-                                        value={formulario.stock_actual}
-                                        onChange={cambiarCampo}
-                                        placeholder="0"
-                                        required
                                     />
                                 </div>
 
@@ -1101,12 +1155,16 @@ function Productos() {
                                     <input
                                         type="checkbox"
                                         name="activo"
-                                        checked={formulario.activo}
-                                        onChange={cambiarCampo}
+                                        checked={
+                                            formulario.activo
+                                        }
+                                        onChange={
+                                            cambiarCampo
+                                        }
                                     />
 
                                     <span>
-                                        Producto activo
+                                        Cliente activo
                                     </span>
                                 </label>
 
@@ -1114,7 +1172,8 @@ function Productos() {
                                     <div
                                         className="config-error"
                                         style={{
-                                            gridColumn: '1 / -1',
+                                            gridColumn:
+                                                '1 / -1',
                                         }}
                                     >
                                         {error}
@@ -1126,22 +1185,34 @@ function Productos() {
                             <div
                                 style={{
                                     display: 'flex',
-                                    justifyContent: 'flex-end',
+                                    justifyContent:
+                                        'flex-end',
                                     gap: '10px',
-                                    padding: '18px 24px',
-                                    borderTop: '1px solid #e2e8f0',
+                                    padding:
+                                        '18px 24px',
+                                    borderTop:
+                                        '1px solid #e2e8f0',
                                 }}
                             >
                                 <button
                                     type="button"
-                                    onClick={cerrarModal}
-                                    disabled={guardando}
+                                    onClick={
+                                        cerrarModal
+                                    }
+                                    disabled={
+                                        guardando
+                                    }
                                     style={{
-                                        border: '1px solid #e2e8f0',
-                                        background: '#ffffff',
-                                        borderRadius: '9px',
-                                        padding: '10px 16px',
-                                        cursor: 'pointer',
+                                        border:
+                                            '1px solid #e2e8f0',
+                                        background:
+                                            '#ffffff',
+                                        borderRadius:
+                                            '9px',
+                                        padding:
+                                            '10px 16px',
+                                        cursor:
+                                            'pointer',
                                     }}
                                 >
                                     Cancelar
@@ -1150,21 +1221,25 @@ function Productos() {
                                 <button
                                     type="submit"
                                     className="config-save-button"
-                                    disabled={guardando}
+                                    disabled={
+                                        guardando
+                                    }
                                 >
                                     <Save size={17} />
 
                                     {guardando
                                         ? 'Guardando...'
-                                        : 'Guardar producto'}
+                                        : 'Guardar cliente'}
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             )}
+
         </div>
     );
 }
 
-export default Productos;
+export default Clientes;

@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class TipoNegocio extends Model
+class Funcionalidad extends Model
 {
-    protected $table = 'tipos_negocio';
+    protected $table = 'funcionalidades';
 
     protected $fillable = [
+        'codigo',
         'nombre',
         'descripcion',
         'activo',
@@ -20,15 +21,15 @@ class TipoNegocio extends Model
     ];
 
     /**
-     * Funcionalidades disponibles para este tipo de negocio.
+     * Tipos de negocio que utilizan esta funcionalidad.
      */
-    public function funcionalidades(): BelongsToMany
+    public function tiposNegocio(): BelongsToMany
     {
         return $this->belongsToMany(
-            Funcionalidad::class,
+            TipoNegocio::class,
             'tipo_negocio_funcionalidades',
-            'tipo_negocio_id',
-            'funcionalidad_id'
+            'funcionalidad_id',
+            'tipo_negocio_id'
         );
     }
 }

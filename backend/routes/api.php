@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\TipoNegocioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\ProductoController;
+use App\Http\Controllers\Api\FuncionalidadController;
+use App\Http\Controllers\Api\ClienteController;
+use App\Http\Controllers\Api\ProveedorController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -26,6 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/roles', [UsuarioController::class, 'roles']);
     Route::get('/usuarios-empresas', [UsuarioController::class, 'empresas']);
+    Route::get('/mis-funcionalidades', [
+    FuncionalidadController::class,
+    'misFuncionalidades'
+    ]);
 
     /*
     |--------------------------------------------------------------------------
@@ -50,18 +57,49 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | PRODUCTOS
+    | funcionalidades
     |--------------------------------------------------------------------------
     */
 
+    Route::get('/funcionalidades', [FuncionalidadController::class, 'index']);
+    Route::get('/tipos-negocio/{tipo}/funcionalidades', [FuncionalidadController::class, 'porTipoNegocio']);
+    Route::put('/tipos-negocio/{tipo}/funcionalidades', [FuncionalidadController::class, 'sincronizar']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | PRODUCTOS
+    |--------------------------------------------------------------------------
+    */
     Route::get('/productos', [ProductoController::class, 'index']);
     Route::post('/productos', [ProductoController::class, 'store']);
     Route::put('/productos/{producto}', [ProductoController::class, 'update']);
     Route::patch('/productos/{producto}/estado', [ProductoController::class, 'cambiarEstado']);
     /*
+
+    /*
     |--------------------------------------------------------------------------
+    | CLIENTES
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/clientes', [ClienteController::class, 'index']);
+    Route::post('/clientes', [ClienteController::class, 'store']);
+    Route::put('/clientes/{cliente}', [ClienteController::class, 'update']);
+    Route::patch('/clientes/{cliente}/estado', [ClienteController::class, 'cambiarEstado']);
+
+    /* 
+    ||--------------------------------------------------------------------------
+    PROVEEDORES
+    ||--------------------------------------------------------------------------
+    */
+    Route::get('/proveedores', [ProveedorController::class, 'index']);
+    Route::post('/proveedores', [ProveedorController::class, 'store']);
+    Route::put('/proveedores/{proveedor}', [ProveedorController::class, 'update']);
+    Route::patch('/proveedores/{proveedor}/estado', [ProveedorController::class, 'cambiarEstado']);
+
+    /*
+    |------------------------------------------------------------------------------
     | CONTEXTO DE LA INSTALACIÓN
-    |--------------------------------------------------------------------------
+    |------------------------------------------------------------------------------
     */
 
     Route::get('/contexto', [EmpresaController::class, 'contexto']);

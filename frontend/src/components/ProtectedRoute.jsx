@@ -1,92 +1,92 @@
-import { Navigate } from 'react-router-dom';
-import { tienePermiso } from '../utils/permisos';
+import {
+    Navigate,
+    Outlet,
+} from 'react-router-dom';
 
-function ProtectedRoute({ children, permiso }) {
+function ProtectedRoute({
+    children,
+    funcionalidad = null,
+    permiso = null,
+}) {
     const token = localStorage.getItem('token');
 
-    /*
-    |--------------------------------------------------------------------------
-    | No hay sesión
-    |--------------------------------------------------------------------------
-    */
-
-    if (!token) {
-        return <Navigate to="/" replace />;
-    }
-
+    const usuario = JSON.parse(
+        localStorage.getItem('usuario')
+    );
 
     /*
     |--------------------------------------------------------------------------
-    | Hay sesión pero no tiene permiso
+    | SESIÓN
     |--------------------------------------------------------------------------
     */
 
-    if (permiso && !tienePermiso(permiso)) {
+    if (!token || !usuario) {
         return (
-            <div
-                style={{
-                    minHeight: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '40px',
-                }}
-            >
-
-                <div
-                    style={{
-                        maxWidth: '520px',
-                        width: '100%',
-                        textAlign: 'center',
-                        padding: '40px',
-                        background: '#ffffff',
-                        borderRadius: '16px',
-                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
-                    }}
-                >
-
-                    <div
-                        style={{
-                            fontSize: '48px',
-                            marginBottom: '20px',
-                        }}
-                    >
-                        🔒
-                    </div>
-
-                    <h2
-                        style={{
-                            marginBottom: '12px',
-                        }}
-                    >
-                        Acceso denegado
-                    </h2>
-
-                    <p
-                        style={{
-                            margin: 0,
-                            color: '#6b7280',
-                            lineHeight: '1.6',
-                        }}
-                    >
-                        No tienes permisos suficientes para acceder
-                        a este módulo.
-                    </p>
-
-                </div>
-
-            </div>
+            <Navigate
+                to="/"
+                replace
+            />
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | Usuario autorizado
+    | FUNCIONALIDAD
     |--------------------------------------------------------------------------
     */
 
-    return children;
+    const funcionalidades =
+        usuario.funcionalidades ?? [];
+
+    const tieneFuncionalidad =
+        !funcionalidad ||
+        funcionalidades.some(
+            (item) =>
+                item.codigo === funcionalidad
+        );
+
+    /*
+    |--------------------------------------------------------------------------
+    | PERMISO
+    |--------------------------------------------------------------------------
+    */
+
+    const permisos =
+        usuario.permisos ?? [];
+
+    const tienePermiso =
+        !permiso ||
+        permisos.includes(permiso);
+
+    /*
+    |--------------------------------------------------------------------------
+    | AUTORIZACIÓN
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        !tieneFuncionalidad ||
+        !tienePermiso
+    ) {
+        return (
+            <Navigate
+                to="/acceso-denegado"
+                replace
+            />
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONTENIDO
+    |--------------------------------------------------------------------------
+    */
+
+    if (children) {
+        return children;
+    }
+
+    return <Outlet />;
 }
 
 export default ProtectedRoute;

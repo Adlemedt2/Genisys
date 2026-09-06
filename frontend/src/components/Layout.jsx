@@ -1,29 +1,51 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { tienePermiso } from '../utils/permisos';
 import {
     LayoutDashboard,
-    Tags,
     Package,
-    ShoppingBag,
     ShoppingCart,
+    ShoppingBag,
     Factory,
     Calculator,
     BarChart3,
+    Tags,
     Settings,
     LogOut,
     Bell,
     ChevronDown,
-    Store,
-    Users,
 } from 'lucide-react';
 
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 function Layout() {
     const navigate = useNavigate();
 
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const usuario = JSON.parse(
+        localStorage.getItem('usuario')
+    );
+
     const token = localStorage.getItem('token');
+
+    /*
+    |--------------------------------------------------------------------------
+    | FUNCIONALIDADES DE LA EMPRESA
+    |--------------------------------------------------------------------------
+    */
+
+    const funcionalidades =
+        usuario?.funcionalidades ?? [];
+
+    const tieneFuncionalidad = (codigo) => {
+        return funcionalidades.some(
+            (funcionalidad) =>
+                funcionalidad.codigo === codigo
+        );
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | CERRAR SESIÓN
+    |--------------------------------------------------------------------------
+    */
 
     const cerrarSesion = async () => {
         try {
@@ -37,18 +59,23 @@ function Layout() {
                 }
             );
         } catch (error) {
-            console.error('Error al cerrar sesión:', error);
+            console.error(
+                'Error al cerrar sesión:',
+                error
+            );
         } finally {
             localStorage.removeItem('token');
             localStorage.removeItem('usuario');
 
-            navigate('/', { replace: true });
+            navigate('/', {
+                replace: true,
+            });
         }
     };
 
     /*
     |--------------------------------------------------------------------------
-    | Menú principal
+    | MENÚ PRINCIPAL
     |--------------------------------------------------------------------------
     */
 
@@ -57,61 +84,77 @@ function Layout() {
             nombre: 'Dashboard',
             ruta: '/dashboard',
             icono: LayoutDashboard,
+            funcionalidad: null,
         },
+
         {
             nombre: 'Catálogos',
             ruta: '/catalogos',
             icono: Tags,
-            permiso: 'productos.ver',
+            funcionalidad: 'catalogos',
         },
+
         {
             nombre: 'Inventario',
             ruta: '/inventario',
             icono: Package,
-            permiso: 'inventario.ver',
+            funcionalidad: 'inventario',
         },
+
         {
             nombre: 'Compras',
             ruta: '/compras',
             icono: ShoppingBag,
-            permiso: 'compras.ver',
+            funcionalidad: 'compras',
         },
+
         {
             nombre: 'Ventas',
             ruta: '/ventas',
             icono: ShoppingCart,
-            permiso: 'ventas.ver',
+            funcionalidad: 'ventas',
         },
+
         {
             nombre: 'Producción',
             ruta: '/produccion',
             icono: Factory,
-            permiso: 'produccion.ver',
+            funcionalidad: 'produccion',
         },
+
         {
             nombre: 'Contabilidad',
             ruta: '/contabilidad',
             icono: Calculator,
-            permiso: 'contabilidad.ver',
+            funcionalidad: 'contabilidad',
         },
+
         {
             nombre: 'Reportes',
             ruta: '/reportes',
             icono: BarChart3,
-            permiso: 'reportes.ver',
+            funcionalidad: 'reportes',
         },
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENÚ VISIBLE
+    |--------------------------------------------------------------------------
+    */
+
+    const menuVisible = menuPrincipal.filter(
+        (item) =>
+            item.funcionalidad === null ||
+            tieneFuncionalidad(item.funcionalidad)
+    );
 
     return (
         <div className="app-layout">
 
-            {/* =========================================
-                SIDEBAR
-            ========================================= */}
+            {/* SIDEBAR */}
 
             <aside className="sidebar">
-
-                {/* LOGO */}
 
                 <div className="sidebar-logo">
 
@@ -121,13 +164,13 @@ function Layout() {
 
                     <div>
                         <h1>GENISYS</h1>
-                        <span>Gestión empresarial</span>
+
+                        <span>
+                            Gestión empresarial
+                        </span>
                     </div>
 
                 </div>
-
-
-                {/* MENÚ PRINCIPAL */}
 
                 <div className="menu-title">
                     MENÚ PRINCIPAL
@@ -135,27 +178,9 @@ function Layout() {
 
                 <nav className="sidebar-menu">
 
-                    {menuPrincipal.map((item) => {
+                    {menuVisible.map((item) => {
 
                         const Icono = item.icono;
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Dashboard
-                        |--------------------------------------------------------------------------
-                        | Se mantiene visible.
-                        |
-                        | Los demás módulos solamente aparecen si el usuario
-                        | tiene el permiso correspondiente.
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (
-                            item.permiso &&
-                            !tienePermiso(item.permiso)
-                        ) {
-                            return null;
-                        }
 
                         return (
                             <NavLink
@@ -176,98 +201,26 @@ function Layout() {
 
                             </NavLink>
                         );
-
                     })}
 
                 </nav>
-
 
                 {/* PARTE INFERIOR */}
 
                 <div className="sidebar-bottom">
 
+                    <NavLink
+                        to="/configuracion"
+                        className="menu-item"
+                    >
 
-                    {/* =====================================
-                        USUARIOS
-                    ===================================== */}
+                        <Settings size={19} />
 
-                    {tienePermiso('usuarios.ver') && (
+                        <span>
+                            Configuración
+                        </span>
 
-                        <NavLink
-                            to="/usuarios"
-                            className={({ isActive }) =>
-                                isActive
-                                    ? 'menu-item active'
-                                    : 'menu-item'
-                            }
-                        >
-
-                            <Users size={19} />
-
-                            <span>
-                                Usuarios
-                            </span>
-
-                        </NavLink>
-
-                    )}
-
-
-                    {/* =====================================
-                        TIPOS DE NEGOCIO
-                    ===================================== */}
-
-                    {tienePermiso('tipos_negocio.ver') && (
-
-                        <NavLink
-                            to="/tipos-negocio"
-                            className={({ isActive }) =>
-                                isActive
-                                    ? 'menu-item active'
-                                    : 'menu-item'
-                            }
-                        >
-
-                            <Store size={19} />
-
-                            <span>
-                                Tipos de negocio
-                            </span>
-
-                        </NavLink>
-
-                    )}
-
-
-                    {/* =====================================
-                        CONFIGURACIÓN
-                    ===================================== */}
-
-                    {tienePermiso('empresa.ver') && (
-
-                        <NavLink
-                            to="/configuracion"
-                            className={({ isActive }) =>
-                                isActive
-                                    ? 'menu-item active'
-                                    : 'menu-item'
-                            }
-                        >
-
-                            <Settings size={19} />
-
-                            <span>
-                                Configuración
-                            </span>
-
-                        </NavLink>
-
-                    )}
-
-
-                    {/* =====================================
-                        CERRAR SESIÓN
-                    ===================================== */}
+                    </NavLink>
 
                     <button
                         className="logout-button"
@@ -286,17 +239,11 @@ function Layout() {
 
             </aside>
 
-
-            {/* =========================================
-                ÁREA PRINCIPAL
-            ========================================= */}
+            {/* ÁREA PRINCIPAL */}
 
             <div className="main-area">
 
-
-                {/* =========================================
-                    TOPBAR
-                ========================================= */}
+                {/* HEADER */}
 
                 <header className="topbar">
 
@@ -308,16 +255,9 @@ function Layout() {
 
                     </div>
 
-
                     <div className="topbar-right">
 
-
-                        {/* NOTIFICACIONES */}
-
-                        <button
-                            className="notification-button"
-                            type="button"
-                        >
+                        <button className="notification-button">
 
                             <Bell size={20} />
 
@@ -325,19 +265,13 @@ function Layout() {
 
                         </button>
 
-
-                        {/* USUARIO */}
-
                         <div className="user-profile">
 
                             <div className="user-avatar">
-
                                 {usuario?.name
                                     ?.charAt(0)
                                     .toUpperCase()}
-
                             </div>
-
 
                             <div className="user-info">
 
@@ -351,7 +285,6 @@ function Layout() {
 
                             </div>
 
-
                             <ChevronDown size={16} />
 
                         </div>
@@ -360,15 +293,10 @@ function Layout() {
 
                 </header>
 
-
-                {/* =========================================
-                    CONTENIDO
-                ========================================= */}
+                {/* CONTENIDO */}
 
                 <main className="content-area">
-
                     <Outlet />
-
                 </main>
 
             </div>

@@ -20,10 +20,12 @@ class Empresa extends Model
         'direccion',
         'logo',
         'activo',
+        'configuracion_completada',
     ];
 
     protected $casts = [
         'activo' => 'boolean',
+        'configuracion_completada' => 'boolean',
     ];
 
     /**
@@ -36,6 +38,10 @@ class Empresa extends Model
             'tipo_negocio_id'
         );
     }
+
+    /**
+     * Productos de la empresa.
+     */
     public function productos()
     {
         return $this->hasMany(Producto::class);
@@ -48,6 +54,23 @@ class Empresa extends Model
     {
         return $this->hasMany(
             User::class,
+            'empresa_id'
+        );
+    }
+    /**
+     * Clientes pertenecientes a la empresa.
+     */
+    public function clientes(): HasMany
+    {
+        return $this->hasMany(
+            Cliente::class,
+            'empresa_id'
+        );
+    }
+    public function proveedores(): HasMany
+    {
+        return $this->hasMany(
+            Proveedor::class,
             'empresa_id'
         );
     }

@@ -2479,3 +2479,634 @@ app.css copia
 /* =========================================================
    FORMULARIO DE PRODUCTOS - ESTILOS PRINCIPALES
    ========================================================= */
+   /* =========================================================
+   FORMULARIO DE PRODUCTOS - ESTILOS PRINCIPALES
+   ========================================================= */
+
+.productos-modal {
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+
+    box-shadow:
+        0 20px 45px rgba(15, 23, 42, 0.18);
+
+    animation: productosModalEntrada 0.18s ease-out;
+}
+
+@keyframes productosModalEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =========================================================
+   HEADER DEL MODAL
+   ========================================================= */
+
+.productos-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.productos-modal-header h2 {
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.productos-modal-header p {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BOTÓN CERRAR
+   ========================================================= */
+
+.productos-modal-close {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #f1f5f9;
+    color: #475569;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.productos-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.productos-modal-close:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   FORMULARIO
+   ========================================================= */
+
+.productos-modal form {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 24px;
+}
+
+
+/* =========================================================
+   GRID DEL FORMULARIO
+   ========================================================= */
+
+.productos-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px 22px;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   CAMPOS
+   ========================================================= */
+
+.productos-form-group {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    width: 100%;
+
+    min-width: 0;
+
+    gap: 7px;
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+.productos-form-group-full {
+    grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
+.productos-form-group label {
+    display: block;
+
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    color: #334155;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   INPUTS Y SELECTS
+   ========================================================= */
+
+.productos-form-group input,
+.productos-form-group select,
+.productos-form-group textarea {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.productos-form-group input,
+.productos-form-group select {
+    height: 44px;
+
+    padding: 0 13px;
+}
+
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.productos-form-group textarea {
+    min-height: 100px;
+
+    padding: 12px 13px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
+
+.productos-form-group input::placeholder,
+.productos-form-group textarea::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.productos-form-group select {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.productos-form-group input:focus,
+.productos-form-group select:focus,
+.productos-form-group textarea:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================================================
+   CHECKBOX / PRODUCTO ACTIVO
+   ========================================================= */
+
+.productos-checkbox-group {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-top: 2px;
+}
+
+.productos-checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+
+    margin: 0;
+
+    accent-color: #2563eb;
+
+    cursor: pointer;
+}
+
+.productos-checkbox-group label {
+    width: auto;
+
+    margin: 0;
+
+    color: #334155;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   MENSAJES
+   ========================================================= */
+
+.productos-modal .tipos-negocio-message {
+    margin: 18px 0 0;
+}
+
+
+/* =========================================================
+   MENSAJE DE ERROR
+   ========================================================= */
+
+.productos-modal .tipos-negocio-message.error {
+    padding: 12px 14px;
+
+    border-radius: 9px;
+
+    background: #fef2f2;
+
+    border: 1px solid #fecaca;
+
+    color: #b91c1c;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   MENSAJE DE ÉXITO
+   ========================================================= */
+
+.productos-modal .tipos-negocio-message.success {
+    padding: 12px 14px;
+
+    border-radius: 9px;
+
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+
+    color: #166534;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.productos-modal-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    width: 100%;
+
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #edf0f4;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BOTÓN CANCELAR
+   ========================================================= */
+
+.productos-modal-footer .tipos-negocio-secondary-button {
+    height: 42px;
+
+    min-width: 110px;
+}
+
+
+/* =========================================================
+   BOTÓN GUARDAR
+   ========================================================= */
+
+.productos-modal-footer .tipos-negocio-primary-button {
+    height: 42px;
+
+    min-width: 155px;
+}
+
+
+/* =========================================================
+   DISABLED
+   ========================================================= */
+
+.productos-form-group input:disabled,
+.productos-form-group select:disabled,
+.productos-form-group textarea:disabled {
+    background: #f8fafc;
+
+    color: #94a3b8;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .productos-modal {
+        max-width: 680px;
+    }
+
+    .productos-form-grid {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+    .productos-form-group-full {
+        grid-column: auto;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE MÓVIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .tipos-negocio-modal-overlay {
+        align-items: flex-start;
+
+        padding: 15px;
+    }
+
+    .productos-modal {
+        max-width: calc(100vw - 30px);
+
+        max-height: 92vh;
+
+        margin-top: 20px;
+
+        border-radius: 14px;
+    }
+
+    .productos-modal-header {
+        padding: 18px;
+    }
+
+    .productos-modal-header h2 {
+        font-size: 19px;
+    }
+
+    .productos-modal form {
+        padding: 18px;
+    }
+
+    .productos-form-grid {
+        grid-template-columns: 1fr;
+
+        gap: 17px;
+    }
+
+    .productos-form-group-full {
+        grid-column: auto;
+    }
+
+    .productos-modal-footer {
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+
+        padding-top: 16px;
+    }
+
+    .productos-modal-footer button {
+        width: 100%;
+
+        min-width: 0;
+    }
+}
+/* =========================================================
+   FORMULARIO DE PRODUCTOS
+   ========================================================= */
+
+.producto-form-grid {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.producto-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.producto-form-field-full {
+    grid-column: 1 / -1;
+}
+
+.producto-form-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.producto-form-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.producto-form-input,
+.producto-form-select,
+.producto-form-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.producto-form-input,
+.producto-form-select {
+    height: 44px;
+    padding: 0 13px;
+}
+
+.producto-form-textarea {
+    min-height: 100px;
+    padding: 12px 13px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.producto-form-input::placeholder,
+.producto-form-textarea::placeholder {
+    color: #94a3b8;
+}
+
+.producto-form-input:hover,
+.producto-form-select:hover,
+.producto-form-textarea:hover {
+    border-color: #cbd5e1;
+}
+
+.producto-form-input:focus,
+.producto-form-select:focus,
+.producto-form-textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.producto-form-checkbox {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 2px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.producto-form-checkbox input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #2563eb;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+    .producto-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .producto-form-field-full {
+        grid-column: auto;
+    }
+
+    .producto-form-checkbox {
+        grid-column: auto;
+    }
+}

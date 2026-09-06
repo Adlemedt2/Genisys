@@ -3,23 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Producto;
+use App\Models\Proveedor;
 use App\Services\EmpresaContext;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 
-class ProductoController extends Controller
+class ProveedorController extends Controller
 {
-    /**
-     * Verificar que el usuario tenga habilitado el módulo
-     * correspondiente a productos para su tipo de negocio.
-     */
     private function verificarFuncionalidad(
         EmpresaContext $empresaContext,
         $usuario
     ): ?JsonResponse {
-        if (!$empresaContext->tieneFuncionalidad($usuario, 'catalogos')) {
+        if (!$empresaContext->tieneFuncionalidad(
+            $usuario,
+            'catalogos'
+        )) {
             return response()->json([
                 'message' => 'El módulo de catálogos no está habilitado para el tipo de negocio de esta empresa.',
             ], 403);
@@ -28,18 +27,15 @@ class ProductoController extends Controller
         return null;
     }
 
-    /**
-     * Listar productos de la empresa actual.
-     */
     public function index(
         Request $request,
         EmpresaContext $empresaContext
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.ver')) {
+        if (!$usuario->tienePermiso('proveedores.ver')) {
             return response()->json([
-                'message' => 'No tienes permisos para consultar productos.',
+                'message' => 'No tienes permisos para consultar proveedores.',
             ], 403);
         }
 
@@ -55,7 +51,7 @@ class ProductoController extends Controller
         try {
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
-            $productos = Producto::where(
+            $proveedores = Proveedor::where(
                 'empresa_id',
                 $empresa->id
             )
@@ -63,7 +59,7 @@ class ProductoController extends Controller
                 ->get();
 
             return response()->json([
-                'productos' => $productos,
+                'proveedores' => $proveedores,
             ]);
 
         } catch (\RuntimeException $error) {
@@ -74,18 +70,15 @@ class ProductoController extends Controller
         }
     }
 
-    /**
-     * Crear un producto.
-     */
     public function store(
         Request $request,
         EmpresaContext $empresaContext
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.crear')) {
+        if (!$usuario->tienePermiso('proveedores.crear')) {
             return response()->json([
-                'message' => 'No tienes permisos para crear productos.',
+                'message' => 'No tienes permisos para crear proveedores.',
             ], 403);
         }
 
@@ -102,82 +95,75 @@ class ProductoController extends Controller
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
             $datos = $request->validate([
-                'codigo' => [
+                'tipo_documento' => [
                     'required',
                     'string',
-                    'max:100',
-                    Rule::unique('productos', 'codigo')
-                        ->where(
-                            fn ($query) =>
-                            $query->where(
-                                'empresa_id',
-                                $empresa->id
-                            )
-                        ),
+                    'max:30',
                 ],
-
+                'numero_documento' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique(
+                        'proveedores',
+                        'numero_documento'
+                    )->where(
+                        fn ($query) =>
+                        $query->where(
+                            'empresa_id',
+                            $empresa->id
+                        )
+                    ),
+                ],
                 'nombre' => [
                     'required',
                     'string',
                     'max:150',
                 ],
-
-                'descripcion' => [
+                'telefono' => [
                     'nullable',
                     'string',
+                    'max:30',
                 ],
-
-                'categoria' => [
+                'email' => [
+                    'nullable',
+                    'email',
+                    'max:150',
+                ],
+                'direccion' => [
+                    'nullable',
+                    'string',
+                    'max:200',
+                ],
+                'ciudad' => [
                     'nullable',
                     'string',
                     'max:100',
                 ],
-
-                'unidad_medida' => [
-                    'required',
+                'contacto' => [
+                    'nullable',
                     'string',
-                    'max:50',
+                    'max:150',
                 ],
-
-                'precio_compra' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'observaciones' => [
+                    'nullable',
+                    'string',
                 ],
-
-                'precio_venta' => [
-                    'required',
-                    'numeric',
-                    'min:0',
-                ],
-
-                'stock_minimo' => [
-                    'required',
-                    'numeric',
-                    'min:0',
-                ],
-
-                'stock_actual' => [
-                    'required',
-                    'numeric',
-                    'min:0',
-                ],
-
                 'activo' => [
                     'sometimes',
                     'boolean',
                 ],
             ]);
 
-            $producto = Producto::create([
+            $proveedor = Proveedor::create([
                 ...$datos,
                 'empresa_id' => $empresa->id,
                 'activo' => $datos['activo'] ?? true,
             ]);
 
             return response()->json([
-                'message' => 'Producto creado correctamente.',
-                'producto' => $producto,
+                'message' => 'Proveedor creado correctamente.',
+                'proveedor' => $proveedor,
             ], 201);
 
         } catch (\RuntimeException $error) {
@@ -188,19 +174,16 @@ class ProductoController extends Controller
         }
     }
 
-    /**
-     * Actualizar un producto.
-     */
     public function update(
         Request $request,
-        Producto $producto,
+        Proveedor $proveedor,
         EmpresaContext $empresaContext
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.editar')) {
+        if (!$usuario->tienePermiso('proveedores.editar')) {
             return response()->json([
-                'message' => 'No tienes permisos para editar productos.',
+                'message' => 'No tienes permisos para editar proveedores.',
             ], 403);
         }
 
@@ -216,86 +199,81 @@ class ProductoController extends Controller
         try {
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
-            if ((int) $producto->empresa_id !== (int) $empresa->id) {
+            if (
+                (int) $proveedor->empresa_id !==
+                (int) $empresa->id
+            ) {
                 return response()->json([
-                    'message' => 'El producto no pertenece a la empresa actual.',
+                    'message' => 'El proveedor no pertenece a la empresa actual.',
                 ], 403);
             }
 
             $datos = $request->validate([
-                'codigo' => [
+                'tipo_documento' => [
                     'required',
                     'string',
-                    'max:100',
-                    Rule::unique('productos', 'codigo')
-                        ->where(
-                            fn ($query) =>
-                            $query->where(
-                                'empresa_id',
-                                $empresa->id
-                            )
-                        )
-                        ->ignore($producto->id),
+                    'max:30',
                 ],
-
+                'numero_documento' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique(
+                        'proveedores',
+                        'numero_documento'
+                    )->where(
+                        fn ($query) =>
+                        $query->where(
+                            'empresa_id',
+                            $empresa->id
+                        )
+                    )->ignore($proveedor->id),
+                ],
                 'nombre' => [
                     'required',
                     'string',
                     'max:150',
                 ],
-
-                'descripcion' => [
+                'telefono' => [
                     'nullable',
                     'string',
+                    'max:30',
                 ],
-
-                'categoria' => [
+                'email' => [
+                    'nullable',
+                    'email',
+                    'max:150',
+                ],
+                'direccion' => [
+                    'nullable',
+                    'string',
+                    'max:200',
+                ],
+                'ciudad' => [
                     'nullable',
                     'string',
                     'max:100',
                 ],
-
-                'unidad_medida' => [
-                    'required',
+                'contacto' => [
+                    'nullable',
                     'string',
-                    'max:50',
+                    'max:150',
                 ],
-
-                'precio_compra' => [
-                    'required',
-                    'numeric',
-                    'min:0',
+                'observaciones' => [
+                    'nullable',
+                    'string',
                 ],
-
-                'precio_venta' => [
-                    'required',
-                    'numeric',
-                    'min:0',
-                ],
-
-                'stock_minimo' => [
-                    'required',
-                    'numeric',
-                    'min:0',
-                ],
-
-                'stock_actual' => [
-                    'required',
-                    'numeric',
-                    'min:0',
-                ],
-
                 'activo' => [
                     'sometimes',
                     'boolean',
                 ],
             ]);
 
-            $producto->update($datos);
+            $proveedor->update($datos);
 
             return response()->json([
-                'message' => 'Producto actualizado correctamente.',
-                'producto' => $producto->fresh(),
+                'message' => 'Proveedor actualizado correctamente.',
+                'proveedor' => $proveedor->fresh(),
             ]);
 
         } catch (\RuntimeException $error) {
@@ -306,19 +284,16 @@ class ProductoController extends Controller
         }
     }
 
-    /**
-     * Activar o desactivar un producto.
-     */
     public function cambiarEstado(
         Request $request,
-        Producto $producto,
+        Proveedor $proveedor,
         EmpresaContext $empresaContext
     ) {
         $usuario = $request->user();
 
-        if (!$usuario->tienePermiso('productos.eliminar')) {
+        if (!$usuario->tienePermiso('proveedores.editar')) {
             return response()->json([
-                'message' => 'No tienes permisos para cambiar el estado de productos.',
+                'message' => 'No tienes permisos para cambiar el estado de proveedores.',
             ], 403);
         }
 
@@ -334,20 +309,23 @@ class ProductoController extends Controller
         try {
             $empresa = $empresaContext->obtenerEmpresa($usuario);
 
-            if ((int) $producto->empresa_id !== (int) $empresa->id) {
+            if (
+                (int) $proveedor->empresa_id !==
+                (int) $empresa->id
+            ) {
                 return response()->json([
-                    'message' => 'El producto no pertenece a la empresa actual.',
+                    'message' => 'El proveedor no pertenece a la empresa actual.',
                 ], 403);
             }
 
-            $producto->activo = !$producto->activo;
-            $producto->save();
+            $proveedor->activo = !$proveedor->activo;
+            $proveedor->save();
 
             return response()->json([
-                'message' => $producto->activo
-                    ? 'Producto activado correctamente.'
-                    : 'Producto desactivado correctamente.',
-                'producto' => $producto->fresh(),
+                'message' => $proveedor->activo
+                    ? 'Proveedor activado correctamente.'
+                    : 'Proveedor desactivado correctamente.',
+                'proveedor' => $proveedor->fresh(),
             ]);
 
         } catch (\RuntimeException $error) {
