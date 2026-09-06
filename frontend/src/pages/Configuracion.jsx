@@ -25,6 +25,9 @@ function Configuracion() {
 
     const [tiposNegocio, setTiposNegocio] = useState([]);
 
+    const [configuracionCompletada, setConfiguracionCompletada] =
+        useState(false);
+
     const [cargando, setCargando] = useState(true);
 
     const [guardando, setGuardando] = useState(false);
@@ -41,14 +44,29 @@ function Configuracion() {
     */
 
     useEffect(() => {
-
+        
         const cargarDatos = async () => {
-
             setCargando(true);
-
             setError('');
 
             try {
+                const respuestaContexto =
+                    await api.get('/contexto');
+
+                console.log(
+                    'TIPO DE NEGOCIO:',
+                    respuestaContexto.data.tipo_negocio
+                );
+
+                console.log(
+                    'TIPO NEGOCIO ID:',
+                    respuestaContexto.data.empresa.tipo_negocio_id
+                );
+
+                console.log(
+                    'CONFIGURACION COMPLETADA:',
+                    respuestaContexto.data.empresa.configuracion_completada
+                );
 
                 const [respuestaEmpresa, respuestaTipos] =
                     await Promise.allSettled([
@@ -56,42 +74,23 @@ function Configuracion() {
                         api.get('/tipos-negocio'),
                     ]);
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Tipos de negocio
-                |--------------------------------------------------------------------------
-                */
-
-                if (
-                    respuestaTipos.status === 'fulfilled'
-                ) {
-
+                if (respuestaTipos.status === 'fulfilled') {
                     setTiposNegocio(
                         respuestaTipos.value.data.tipos_negocio || []
                     );
-
                 } else {
-
                     throw new Error(
                         'No fue posible cargar los tipos de negocio.'
                     );
-
                 }
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Empresa
-                |--------------------------------------------------------------------------
-                */
-
-                if (
-                    respuestaEmpresa.status === 'fulfilled'
-                ) {
-
+                if (respuestaEmpresa.status === 'fulfilled') {
                     const empresa =
                         respuestaEmpresa.value.data.empresa;
+
+                    setConfiguracionCompletada(
+                        Boolean(empresa.configuracion_completada)
+                    );
 
                     setFormulario({
                         nombre: empresa.nombre || '',
@@ -103,29 +102,16 @@ function Configuracion() {
                                 ? String(empresa.tipo_negocio_id)
                                 : '',
                     });
-
                 } else {
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | 404 significa que todavía no existe empresa
-                    |--------------------------------------------------------------------------
-                    */
-
                     if (
                         respuestaEmpresa.reason?.response?.status !== 404
                     ) {
-
                         throw new Error(
                             'No fue posible cargar la configuración de la empresa.'
                         );
-
                     }
-
                 }
-
             } catch (error) {
-
                 console.error(
                     'Error cargando configuración:',
                     error
@@ -136,17 +122,12 @@ function Configuracion() {
                     error.message ||
                     'No fue posible cargar la configuración.'
                 );
-
             } finally {
-
                 setCargando(false);
-
             }
         };
 
-
         cargarDatos();
-
     }, []);
 
 
@@ -162,6 +143,21 @@ function Configuracion() {
             name,
             value,
         } = e.target;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | El tipo de negocio queda bloqueado después
+        | de completar la configuración inicial.
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            name === 'tipo_negocio_id' &&
+            configuracionCompletada
+        ) {
+            return;
+        }
 
 
         setFormulario((anterior) => ({
@@ -196,21 +192,54 @@ function Configuracion() {
 
         try {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Datos generales de la empresa
+            |--------------------------------------------------------------------------
+            */
+
+            const datos = {
+                nombre: formulario.nombre,
+                nit: formulario.nit,
+                telefono: formulario.telefono,
+                direccion: formulario.direccion,
+            };
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Durante la configuración inicial se debe enviar
+            | el tipo de negocio.
+            |--------------------------------------------------------------------------
+            */
+
+            if (!configuracionCompletada) {
+
+                datos.tipo_negocio_id =
+                    Number(formulario.tipo_negocio_id);
+
+            }
+
+
             const respuesta = await api.post(
                 '/empresa',
-                {
-                    nombre: formulario.nombre,
-                    nit: formulario.nit,
-                    telefono: formulario.telefono,
-                    direccion: formulario.direccion,
-                    tipo_negocio_id:
-                        Number(formulario.tipo_negocio_id),
-                }
+                datos
             );
 
 
             const empresa =
                 respuesta.data.empresa;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | La configuración inicial ya quedó completada.
+            |--------------------------------------------------------------------------
+            */
+
+            setConfiguracionCompletada(
+                Boolean(empresa.configuracion_completada)
+            );
 
 
             /*
@@ -525,6 +554,7 @@ function Configuracion() {
                                     value={formulario.tipo_negocio_id}
                                     onChange={cambiarCampo}
                                     required
+                                    disabled={configuracionCompletada}
                                 >
 
                                     <option value="">
@@ -592,12 +622,17 @@ function Configuracion() {
                         <div>
 
                             <strong>
-                                Configuración del negocio
+                                {configuracionCompletada
+                                    ? 'Tipo de negocio configurado'
+                                    : 'Configuración inicial del negocio'
+                                }
                             </strong>
 
                             <p>
-                                El tipo de negocio permitirá que GENISYS
-                                adapte posteriormente sus catálogos y módulos.
+                                {configuracionCompletada
+                                    ? 'El tipo de negocio está definido para esta instalación de GENISYS y no puede modificarse.'
+                                    : 'Selecciona el tipo de negocio que utilizará esta instalación de GENISYS. Una vez guardado, quedará definido para el sistema.'
+                                }
                             </p>
 
                         </div>

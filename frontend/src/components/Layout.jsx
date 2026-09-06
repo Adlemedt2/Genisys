@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { tienePermiso } from '../utils/permisos';
 import {
     LayoutDashboard,
     Tags,
@@ -13,6 +14,7 @@ import {
     Bell,
     ChevronDown,
     Store,
+    Users,
 } from 'lucide-react';
 
 import api from '../services/api';
@@ -46,18 +48,6 @@ function Layout() {
 
     /*
     |--------------------------------------------------------------------------
-    | Comprobar Administrador
-    |--------------------------------------------------------------------------
-    */
-
-    const esAdministrador =
-        usuario?.roles?.some(
-            (rol) => rol?.toLowerCase() === 'administrador'
-        ) ?? false;
-
-
-    /*
-    |--------------------------------------------------------------------------
     | Menú principal
     |--------------------------------------------------------------------------
     */
@@ -72,39 +62,45 @@ function Layout() {
             nombre: 'Catálogos',
             ruta: '/catalogos',
             icono: Tags,
+            permiso: 'productos.ver',
         },
         {
             nombre: 'Inventario',
             ruta: '/inventario',
             icono: Package,
+            permiso: 'inventario.ver',
         },
         {
             nombre: 'Compras',
             ruta: '/compras',
             icono: ShoppingBag,
+            permiso: 'compras.ver',
         },
         {
             nombre: 'Ventas',
             ruta: '/ventas',
             icono: ShoppingCart,
+            permiso: 'ventas.ver',
         },
         {
             nombre: 'Producción',
             ruta: '/produccion',
             icono: Factory,
+            permiso: 'produccion.ver',
         },
         {
             nombre: 'Contabilidad',
             ruta: '/contabilidad',
             icono: Calculator,
+            permiso: 'contabilidad.ver',
         },
         {
             nombre: 'Reportes',
             ruta: '/reportes',
             icono: BarChart3,
+            permiso: 'reportes.ver',
         },
     ];
-
 
     return (
         <div className="app-layout">
@@ -143,6 +139,24 @@ function Layout() {
 
                         const Icono = item.icono;
 
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Dashboard
+                        |--------------------------------------------------------------------------
+                        | Se mantiene visible.
+                        |
+                        | Los demás módulos solamente aparecen si el usuario
+                        | tiene el permiso correspondiente.
+                        |--------------------------------------------------------------------------
+                        */
+
+                        if (
+                            item.permiso &&
+                            !tienePermiso(item.permiso)
+                        ) {
+                            return null;
+                        }
+
                         return (
                             <NavLink
                                 key={item.ruta}
@@ -172,12 +186,38 @@ function Layout() {
 
                 <div className="sidebar-bottom">
 
+
                     {/* =====================================
-                        TIPOS DE NEGOCIO
-                        SOLO ADMINISTRADOR
+                        USUARIOS
                     ===================================== */}
 
-                    {esAdministrador && (
+                    {tienePermiso('usuarios.ver') && (
+
+                        <NavLink
+                            to="/usuarios"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? 'menu-item active'
+                                    : 'menu-item'
+                            }
+                        >
+
+                            <Users size={19} />
+
+                            <span>
+                                Usuarios
+                            </span>
+
+                        </NavLink>
+
+                    )}
+
+
+                    {/* =====================================
+                        TIPOS DE NEGOCIO
+                    ===================================== */}
+
+                    {tienePermiso('tipos_negocio.ver') && (
 
                         <NavLink
                             to="/tipos-negocio"
@@ -203,22 +243,26 @@ function Layout() {
                         CONFIGURACIÓN
                     ===================================== */}
 
-                    <NavLink
-                        to="/configuracion"
-                        className={({ isActive }) =>
-                            isActive
-                                ? 'menu-item active'
-                                : 'menu-item'
-                        }
-                    >
+                    {tienePermiso('empresa.ver') && (
 
-                        <Settings size={19} />
+                        <NavLink
+                            to="/configuracion"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? 'menu-item active'
+                                    : 'menu-item'
+                            }
+                        >
 
-                        <span>
-                            Configuración
-                        </span>
+                            <Settings size={19} />
 
-                    </NavLink>
+                            <span>
+                                Configuración
+                            </span>
+
+                        </NavLink>
+
+                    )}
 
 
                     {/* =====================================

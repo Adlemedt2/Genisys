@@ -36,6 +36,10 @@ class Empresa extends Model
             'tipo_negocio_id'
         );
     }
+    public function productos()
+    {
+        return $this->hasMany(Producto::class);
+    }
 
     /**
      * Usuarios pertenecientes a la empresa.

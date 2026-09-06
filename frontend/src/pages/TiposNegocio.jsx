@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 
 import api from '../services/api';
+import { tienePermiso } from '../utils/permisos';
 
 function TiposNegocio() {
 
@@ -376,17 +377,16 @@ function TiposNegocio() {
                 </div>
 
 
-                <button
-                    type="button"
-                    className="tipos-negocio-primary-button"
-                    onClick={abrirCrear}
-                >
-
-                    <Plus size={18} />
-
-                    Nuevo tipo
-
-                </button>
+                {tienePermiso('tipos_negocio.crear') && (
+                    <button
+                        type="button"
+                        className="tipos-negocio-primary-button"
+                        onClick={abrirCrear}
+                    >
+                        <Plus size={18} />
+                        Nuevo tipo
+                    </button>
+                )}
 
             </div>
 
@@ -550,40 +550,39 @@ function TiposNegocio() {
 
                                             <div className="tipo-negocio-acciones">
 
-                                                <button
-                                                    type="button"
-                                                    className="tipo-accion editar"
-                                                    onClick={() =>
-                                                        abrirEditar(tipo)
-                                                    }
-                                                    title="Editar"
-                                                >
+                                                {tienePermiso('tipos_negocio.editar') && (
+                                                    <button
+                                                        type="button"
+                                                        className="tipo-accion editar"
+                                                        onClick={() =>
+                                                            abrirEditar(tipo)
+                                                        }
+                                                        title="Editar"
+                                                    >
+                                                        <Pencil size={16} />
+                                                    </button>
+                                                )}
 
-                                                    <Pencil size={16} />
-
-                                                </button>
-
-
-                                                <button
-                                                    type="button"
-                                                    className={
-                                                        tipo.activo
-                                                            ? 'tipo-accion desactivar'
-                                                            : 'tipo-accion activar'
-                                                    }
-                                                    onClick={() =>
-                                                        cambiarEstado(tipo)
-                                                    }
-                                                    title={
-                                                        tipo.activo
-                                                            ? 'Desactivar'
-                                                            : 'Activar'
-                                                    }
-                                                >
-
-                                                    <Power size={16} />
-
-                                                </button>
+                                                {tienePermiso('tipos_negocio.activar') && (
+                                                    <button
+                                                        type="button"
+                                                        className={
+                                                            tipo.activo
+                                                                ? 'tipo-accion desactivar'
+                                                                : 'tipo-accion activar'
+                                                        }
+                                                        onClick={() =>
+                                                            cambiarEstado(tipo)
+                                                        }
+                                                        title={
+                                                            tipo.activo
+                                                                ? 'Desactivar'
+                                                                : 'Activar'
+                                                        }
+                                                    >
+                                                        <Power size={16} />
+                                                    </button>
+                                                )}
 
                                             </div>
 

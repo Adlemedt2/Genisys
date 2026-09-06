@@ -15,13 +15,29 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (!Auth::attempt($credenciales)) {
+        if (!Auth::attempt([
+            'email' => $credenciales['email'],
+            'password' => $credenciales['password'],
+            'activo' => true,
+        ])) {
             return response()->json([
-                'message' => 'Las credenciales son incorrectas.',
+                'message' => 'Las credenciales son incorrectas o el usuario está inactivo.',
             ], 401);
         }
 
         $usuario = $request->user();
+
+        // Cargar roles y permisos
+        $usuario->load('roles.permisos');
+
+        // Obtener todos los permisos de los roles del usuario
+        $permisos = $usuario->roles
+            ->flatMap(function ($rol) {
+                return $rol->permisos;
+            })
+            ->pluck('nombre')
+            ->unique()
+            ->values();
 
         $token = $usuario->createToken('genisys')->plainTextToken;
 
@@ -32,7 +48,11 @@ class AuthController extends Controller
                 'id' => $usuario->id,
                 'name' => $usuario->name,
                 'email' => $usuario->email,
-                'roles' => $usuario->roles->pluck('nombre'),
+                'empresa_id' => $usuario->empresa_id,
+                'roles' => $usuario->roles
+                    ->pluck('nombre')
+                    ->values(),
+                'permisos' => $permisos,
             ],
         ]);
     }
