@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ProductoController;
 use App\Http\Controllers\Api\FuncionalidadController;
 use App\Http\Controllers\Api\ClienteController;
 use App\Http\Controllers\Api\ProveedorController;
+use App\Http\Controllers\Api\InventarioController;
+use App\Http\Controllers\Api\CompraController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -95,6 +97,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/proveedores', [ProveedorController::class, 'store']);
     Route::put('/proveedores/{proveedor}', [ProveedorController::class, 'update']);
     Route::patch('/proveedores/{proveedor}/estado', [ProveedorController::class, 'cambiarEstado']);
+
+    // =============================================
+    // INVENTARIO
+    // =============================================
+
+    Route::get('/inventario', [InventarioController::class, 'index']);
+    Route::get('/inventario/movimientos', [InventarioController::class, 'movimientos']);
+    Route::post('/inventario/entrada', [InventarioController::class, 'entrada']);
+    Route::post('/inventario/salida', [InventarioController::class, 'salida']);
+    Route::post('/inventario/ajuste', [InventarioController::class, 'ajuste']);
+
+    // =============================================
+    // COMPRAS
+    // =============================================
+
+
+    Route::get('/compras', [CompraController::class, 'index']);
+    Route::get('/compras/{compra}', [CompraController::class, 'show']);
+    Route::post('/compras', [CompraController::class, 'store']);
+    Route::patch('/compras/{compra}/recibir', [CompraController::class, 'recibir']);
+    Route::patch('/compras/{compra}/anular', [CompraController::class, 'anular']);
 
     /*
     |------------------------------------------------------------------------------

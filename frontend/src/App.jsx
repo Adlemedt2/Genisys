@@ -22,8 +22,9 @@ import Configuracion from './pages/Configuracion';
 
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-
+import Proveedores from './pages/Proveedores';
 import AccesoDenegado from './pages/AccesoDenegado';
+
 
 
 function App() {
@@ -217,7 +218,20 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
+                    {/* =============================================
+                        PROVEEDORES
+                    ============================================= */}
+                    <Route
+                        path="/catalogos/proveedores"
+                        element={
+                            <ProtectedRoute
+                                funcionalidad="catalogos"
+                                permiso="proveedores.ver"
+                            >
+                                <Proveedores />
+                            </ProtectedRoute>
+                        }
+                    />
                     {/* =============================================
                         CONFIGURACIÓN
                     ============================================= */}

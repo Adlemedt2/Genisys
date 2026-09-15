@@ -55,12 +55,12 @@ class PermisoSeeder extends Seeder
             ['nombre' => 'inventario.ajustes', 'modulo' => 'Inventario', 'descripcion' => 'Realizar ajustes de inventario.'],
 
             // Compras
-            ['nombre' => 'compras.ver', 'modulo' => 'Compras', 'descripcion' => 'Ver compras.'],
+            ['nombre' => 'compras.ver', 'modulo' => 'Compras', 'descripcion' => 'Consultar compras.'],
             ['nombre' => 'compras.crear', 'modulo' => 'Compras', 'descripcion' => 'Registrar compras.'],
-            ['nombre' => 'compras.editar', 'modulo' => 'Compras', 'descripcion' => 'Editar compras.'],
+            ['nombre' => 'compras.editar', 'modulo' => 'Compras', 'descripcion' => 'Recibir y anular compras.'],
 
             // Ventas
-            ['nombre' => 'ventas.ver', 'modulo' => 'Ventas', 'descripcion' => 'Ver ventas.'],
+            ['nombre' => 'ventas.ver', 'modulo' => 'Ventas', 'descripcion' => 'Consultar ventas.'],
             ['nombre' => 'ventas.crear', 'modulo' => 'Ventas', 'descripcion' => 'Registrar ventas.'],
             ['nombre' => 'ventas.editar', 'modulo' => 'Ventas', 'descripcion' => 'Editar ventas.'],
             ['nombre' => 'ventas.anular', 'modulo' => 'Ventas', 'descripcion' => 'Anular ventas.'],

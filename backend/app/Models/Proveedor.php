@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Proveedor extends Model
 {
@@ -35,6 +36,13 @@ class Proveedor extends Model
         return $this->belongsTo(
             Empresa::class,
             'empresa_id'
+        );
+    }
+    public function compras(): HasMany
+    {
+        return $this->hasMany(
+            Compra::class,
+            'proveedor_id'
         );
     }
 }
